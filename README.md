@@ -24,8 +24,8 @@ There are two parts to this loader:
       
 In the simplest way you can just use those two statements like you usually would with the google closure library.
 
-**NOTE**: Usually the closure lib simply creates all namespaces on the *global* scope (i.e. the window object).
-This is *not* the case if you use this loader. Every file ("module") has its own scope just like it would have
+**NOTE**: Usually the closure lib simply creates all namespaces on the **global** scope (i.e. the window object).
+This is **not** the case if you use this loader. Every file ("module") has its own scope just like it would have
 if you used CommonJS syntax.
 
 You can use closure library dependencies in conjunction with CommonJS syntax. You can load any module that uses 
@@ -99,9 +99,9 @@ module.exports = {
 ```
 
 Here are the configuration options specific for this loader:
-- *paths* (array): An array of path strings. The loader will search all `*.js` files within theses
+- **paths** (array): An array of path strings. The loader will search all `*.js` files within theses
   paths for `goog.provide()` statements.
-- *es6mode* (boolean, default: false): If enabled it will add the value of the first `goog.provide()`
+- **es6mode** (boolean, default: false): If enabled it will add the value of the first `goog.provide()`
   as default export for usage with babel. For this reason it will also export the corresponding flag
   `module.exports.__esModule = true`
   
