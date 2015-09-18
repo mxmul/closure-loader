@@ -15,6 +15,7 @@ and to make a transition to other module systems (CommonJS or ES6) easier.
 There are two parts to this loader:
 - `goog.provide()`
     - Basically just creates the given namespace in the local scope of that module
+    - Any file containing this statement will be added to a map for require lookups
 - `goog.require()`
     - Like `goog.provide()` it creates the given namespace in the scope of that module 
     - It finds the corresponding file with the `goog.provide()` statement and loads it (see configuration below)
