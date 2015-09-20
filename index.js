@@ -28,7 +28,6 @@ module.exports = function (source) {
 
 function workProvides(source, localVars, es6mode) {
     var provideRegExp = /goog\.provide\((['"])(([^.)]+)[^)]*)\1\)/g,
-        matchCount = 0,
         firstMatch,
         matches;
 
@@ -42,10 +41,9 @@ function workProvides(source, localVars, es6mode) {
             localVars.push(matches[3]);
         }
         source = source.replace(matches[0], createProvide(matches[2], matches[3]));
-        matchCount++;
     }
 
-    if (es6mode && matchCount === 1 && firstMatch) {
+    if (es6mode && firstMatch) {
         source = appendLine(source, 'module.exports.default = ' + firstMatch + ';');
         source = appendLine(source, 'module.exports.__esModule = true;');
     }
