@@ -7,7 +7,6 @@ var loaderUtils = require("loader-utils"),
     };
 
 
-
 module.exports = function (source) {
     var query = loaderUtils.parseQuery(this.query),
         localVars = [],
@@ -17,13 +16,12 @@ module.exports = function (source) {
     this.cacheable && this.cacheable();
 
     config = buildConfig(query, this.options[query.config || "closureLoader"]);
+
     provideMap = mapBuilder(config.paths);
 
     source = workProvides(source, localVars, config.es6mode);
     source = workRequires(source, localVars, provideMap);
     source = createLocalVariables(source, localVars);
-
-    //console.log(source);
 
     return source;
 };
@@ -98,5 +96,9 @@ function createProvide(key, localVar) {
 }
 
 function createRequire(key, localVar, provideMap) {
+    if (!provideMap[key]) {
+        throw new Error("Can't find closure dependency " + key);
+    }
+
     return "googRequire('" + key + "', " + localVar + "); " + key + " = require('" + provideMap[key] + "')." + key;
 }
