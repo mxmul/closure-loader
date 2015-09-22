@@ -16,12 +16,19 @@
     "url": "git://github.com/eXaminator/closure-loader.git"
   },
   "author": "Steven Weingärtner",
+  "contributors": [
+    "Michael van Engelshoven <michael@van-engelshoven.de>",
+    "Matthias Harmuth <mcpain83@gmail.com>"
+  ],
   "license": "MIT",
   "peerDependencies": {
     "webpack": "^1.9.10"
   },
   "dependencies": {
+    "bluebird": "^2.10.1",
+    "chokidar": "^1.0.6",
     "glob": "^5.0.14",
+    "graceful-fs": "^4.1.2",
     "loader-utils": "^0.2.11",
     "lodash": "^3.10.1"
   }

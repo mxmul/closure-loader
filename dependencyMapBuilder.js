@@ -1,30 +1,88 @@
-var glob = require('glob'),
-    _ = require('lodash'),
-    fs = require('fs'),
+var _ = require('lodash'),
     path = require('path'),
+    chokidar = require('chokidar'),
+    Promise = require('bluebird'),
+    cache = {},
+    glob = Promise.promisify(require('glob')),
+    readFile = Promise.promisify(require('graceful-fs').readFile),
     provideRegExp = /goog\.provide\((['"])(([^.)]+)[^)]*)\1\)/g;
 
+/**
+ * Fulfills in an object wich maps namespaces to file paths found in given
+ * directories.
+ *
+ * @param {string[]} directories
+ * @returns {Promise}
+ */
 module.exports = function (directories) {
-    var files = findJsFiles(directories),
-        provideMap = {};
-
-    files.forEach(function (filePath) {
-        addFileProvides(filePath, provideMap);
-    });
-
-    return provideMap;
+    return Promise.map(directories, function(dir) {
+        return resolveAndCacheDirectory(dir)
+    }).then(function(results) {
+        return _.assign.apply(_, results);
+    })
 };
 
-function addFileProvides(filePath, provideMap) {
-    var fileContent = fs.readFileSync(filePath);
-
-    while (matches = provideRegExp.exec(fileContent)) {
-        provideMap[matches[2]] = filePath;
-    }
+/**
+ * Promisified watch
+ *
+ * Resolves promise after watcher is ready to prevent `add` events during
+ * initializations wich repeatedly deletes our cache.
+ *
+ * @returns {Promise}
+ */
+function watch(directory) {
+    return new Promise(function(resolve, reject) {
+        var watcher = chokidar.watch(directory)
+            .on('ready', function() {
+                resolve(watcher);
+            });
+    });
 }
 
-function findJsFiles(directories) {
-    return _.flatten(directories.map(function(dir) {
-        return glob.sync(path.join(dir, '/**/*.js'));
-    }));
+/**
+ * Fulfills in an object wich maps namespace to file path. The result will be
+ * cached by the given directory name. A file watcher watches for any changes
+ * in this directory and deletes the cached object.
+ *
+ * @param {string} directory
+ * @returns {Promise}
+ */
+function resolveAndCacheDirectory(directory) {
+
+    if (cache[directory]) {
+        return cache[directory];
+    }
+
+    cache[directory] = watch(directory)
+        .then(function(watcher) {
+            watcher.on('all', function() {
+                delete cache[directory];
+            });
+            return glob(path.join(directory, '/**/*.js'));
+        })
+        .map(function(filePath) {
+            return findProvideCalls(filePath);
+        })
+        .then(function(results) {
+            return _.assign.apply(_, results);
+        });
+
+    return cache[directory];
+}
+
+/**
+ * Scans the given file path for occurences of `goog.provide()` and fulfills
+ * in an object wich mapps each namespace to the file path
+ *
+ * @param {string} filePath
+ * @returns {Promise}
+ */
+function findProvideCalls(filePath) {
+    return readFile(filePath).then(function(fileContent) {
+        var result = {};
+        while (matches = provideRegExp.exec(fileContent)) {
+            result[matches[2]] = filePath;
+        }
+        return result;
+    });
 }
