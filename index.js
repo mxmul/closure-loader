@@ -7,8 +7,10 @@ var loaderUtils = require("loader-utils"),
     };
 
 
-module.exports = function (source) {
-    var query = loaderUtils.parseQuery(this.query),
+module.exports = function (source, inputSourceMap) {
+    var self = this,
+        query = loaderUtils.parseQuery(this.query),
+        callback = this.async(),
         localVars = [],
         provideMap,
         config;
@@ -17,13 +19,13 @@ module.exports = function (source) {
 
     config = buildConfig(query, this.options[query.config || "closureLoader"]);
 
-    provideMap = mapBuilder(config.paths);
+    mapBuilder(config.paths).then(function(provideMap) {
+        source = workProvides(source, localVars, config.es6mode);
+        source = workRequires(source, localVars, provideMap);
+        source = createLocalVariables(source, localVars);
 
-    source = workProvides(source, localVars, config.es6mode);
-    source = workRequires(source, localVars, provideMap);
-    source = createLocalVariables(source, localVars);
-
-    return source;
+        callback(null, source, inputSourceMap);
+    });
 };
 
 function workProvides(source, localVars, es6mode) {
