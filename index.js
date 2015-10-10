@@ -8,11 +8,9 @@ var loaderUtils = require("loader-utils"),
 
 
 module.exports = function (source, inputSourceMap) {
-    var self = this,
-        query = loaderUtils.parseQuery(this.query),
+    var query = loaderUtils.parseQuery(this.query),
         callback = this.async(),
         localVars = [],
-        provideMap,
         config;
 
     this.cacheable && this.cacheable();
@@ -20,47 +18,53 @@ module.exports = function (source, inputSourceMap) {
     config = buildConfig(query, this.options[query.config || "closureLoader"]);
 
     mapBuilder(config.paths).then(function(provideMap) {
-        source = workProvides(source, localVars, config.es6mode);
-        source = workRequires(source, localVars, provideMap);
+        source = processProvides(source, localVars, config.es6mode);
+        source = processRequires(source, localVars, provideMap);
         source = createLocalVariables(source, localVars);
 
         callback(null, source, inputSourceMap);
     });
 };
 
-function workProvides(source, localVars, es6mode) {
+function processProvides(source, localVars, es6mode) {
     var provideRegExp = /goog\.provide\((['"])(([^.)]+)[^)]*)\1\)/g,
         firstMatch,
+        possibleDefaults = [],
         matches;
+
+    source = prependLine(source, "var __googProvide = require('closure-loader/provide.js');");
+    source = prependLine(source, "var __getDefault = require('closure-loader/getDefault.js');");
 
     while (matches = provideRegExp.exec(source)) {
         if (!firstMatch) {
-            source = prependLine(source, "var googProvide = require('closure-loader/provide.js');");
             firstMatch = matches[2];
         }
+
+        possibleDefaults.push(matches[2]);
 
         if (localVars.indexOf(matches[3]) < 0) {
             localVars.push(matches[3]);
         }
+
         source = source.replace(matches[0], createProvide(matches[2], matches[3]));
     }
 
     if (es6mode && firstMatch) {
-        source = appendLine(source, 'module.exports.default = ' + firstMatch + ';');
+        source = appendLine(source, 'module.exports.default = __getDefault(module.exports, "' + possibleDefaults.join('", "') + '");');
         source = appendLine(source, 'module.exports.__esModule = true;');
     }
 
     return source;
 }
 
-function workRequires(source, localVars, provideMap) {
+function processRequires(source, localVars, provideMap) {
     var requireRegExp = /goog\.require\((['"])(([^.)]+)[^)]*)\1\)/g,
         isFirst = true,
         matches;
 
     while (matches = requireRegExp.exec(source)) {
         if (isFirst) {
-            source = prependLine(source, "var googRequire = require('closure-loader/require.js');");
+            source = prependLine(source, "var __googRequire = require('closure-loader/require.js');");
             isFirst = false;
         }
         if (localVars.indexOf(matches[3]) < 0) {
@@ -96,7 +100,7 @@ function appendLine(source, line) {
 }
 
 function createProvide(key, localVar) {
-    return localVar + " = googProvide('" + key + "', module.exports)";
+    return localVar + " = __googProvide('" + key + "', module.exports)";
 }
 
 function createRequire(key, localVar, provideMap) {
@@ -104,5 +108,5 @@ function createRequire(key, localVar, provideMap) {
         throw new Error("Can't find closure dependency " + key);
     }
 
-    return "googRequire('" + key + "', " + localVar + "); " + key + " = require('" + provideMap[key] + "')." + key;
+    return "__googRequire('" + key + "', " + localVar + "); " + key + " = require('" + provideMap[key] + "')." + key;
 }

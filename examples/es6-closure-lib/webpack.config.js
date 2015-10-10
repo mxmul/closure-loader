@@ -36,7 +36,6 @@ module.exports = {
                 loaders: [
                     'closure',
                 ],
-                exclude: [/base\.js/],
             },
             // Loader for project js files
             {
