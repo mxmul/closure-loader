@@ -1,10 +1,13 @@
 var loaderUtils = require("loader-utils"),
     _ = require('lodash'),
     mapBuilder = require('./dependencyMapBuilder'),
+    SourceNode = require("source-map").SourceNode,
+    SourceMapConsumer = require("source-map").SourceMapConsumer,
     defaultConfig = config = {
         paths: [],
         es6mode: false
-    };
+    },
+    prefix, postfix;
 
 
 module.exports = function (source, inputSourceMap) {
@@ -13,6 +16,9 @@ module.exports = function (source, inputSourceMap) {
         localVars = [],
         config;
 
+    prefix = [];
+    postfix = [];
+
     this.cacheable && this.cacheable();
 
     config = buildConfig(query, this.options[query.config || "closureLoader"]);
@@ -20,9 +26,21 @@ module.exports = function (source, inputSourceMap) {
     mapBuilder(config.paths).then(function(provideMap) {
         source = processProvides(source, localVars, config.es6mode);
         source = processRequires(source, localVars, provideMap);
-        source = createLocalVariables(source, localVars);
+        createLocalVariables(localVars);
 
-        callback(null, source, inputSourceMap);
+        if(inputSourceMap) {
+            var currentRequest = loaderUtils.getCurrentRequest(this);
+            var node = SourceNode.fromStringWithSourceMap(source, new SourceMapConsumer(inputSourceMap));
+            node.prepend(prefix.join(""));
+            node.add(postfix.join(""));
+            var result = node.toStringWithSourceMap({
+                file: currentRequest
+            });
+            callback(null, result.code, result.map.toJSON());
+            return;
+        }
+
+        callback(null, prefix.join("") + source + postfix.join(""), inputSourceMap);
     });
 };
 
@@ -32,8 +50,8 @@ function processProvides(source, localVars, es6mode) {
         possibleDefaults = [],
         matches;
 
-    source = prependLine(source, "var __googProvide = require('closure-loader/provide.js');");
-    source = prependLine(source, "var __getDefault = require('closure-loader/getDefault.js');");
+    prependLine("var __googProvide = require('closure-loader/provide.js');");
+    prependLine("var __getDefault = require('closure-loader/getDefault.js');");
 
     while (matches = provideRegExp.exec(source)) {
         if (!firstMatch) {
@@ -50,8 +68,8 @@ function processProvides(source, localVars, es6mode) {
     }
 
     if (es6mode && firstMatch) {
-        source = appendLine(source, 'module.exports.default = __getDefault(module.exports, "' + possibleDefaults.join('", "') + '");');
-        source = appendLine(source, 'module.exports.__esModule = true;');
+        appendLine('module.exports.default = __getDefault(module.exports, "' + possibleDefaults.join('", "') + '");');
+        appendLine('module.exports.__esModule = true;');
     }
 
     return source;
@@ -64,7 +82,7 @@ function processRequires(source, localVars, provideMap) {
 
     while (matches = requireRegExp.exec(source)) {
         if (isFirst) {
-            source = prependLine(source, "var __googRequire = require('closure-loader/require.js');");
+            prependLine("var __googRequire = require('closure-loader/require.js');");
             isFirst = false;
         }
         if (localVars.indexOf(matches[3]) < 0) {
@@ -76,27 +94,25 @@ function processRequires(source, localVars, provideMap) {
     return source;
 }
 
-function createLocalVariables(source, localVars) {
+function createLocalVariables(localVars) {
     localVars.forEach(function (variable) {
-        source = prependLine(
-            source,
+        prependLine(
             "if(typeof " + variable + " === 'undefined') eval('var " + variable + " = {};'); " +
             "module.exports." + variable + " = " + variable + ";"
         )
     });
-    return source;
 }
 
 function buildConfig(query, options) {
     return _.merge(_.clone(defaultConfig), options, query);
 }
 
-function prependLine(source, line) {
-    return line + '\n' + source;
+function prependLine(line) {
+    prefix.push(line);
 }
 
-function appendLine(source, line) {
-    return source + '\n' + line;
+function appendLine(line) {
+    postfix.push(line);
 }
 
 function createProvide(key, localVar) {

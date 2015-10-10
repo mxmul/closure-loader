@@ -30,6 +30,7 @@
     "glob": "^5.0.14",
     "graceful-fs": "^4.1.2",
     "loader-utils": "^0.2.11",
-    "lodash": "^3.10.1"
+    "lodash": "^3.10.1",
+    "source-map": "^0.5.1"
   }
 }
