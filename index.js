@@ -74,7 +74,11 @@ function workRequires(source, localVars, provideMap) {
 
 function createLocalVariables(source, localVars) {
     localVars.forEach(function (variable) {
-        source = prependLine(source, "var " + variable + " = {};")
+        source = prependLine(
+            source,
+            "if(typeof " + variable + " === 'undefined') eval('var " + variable + " = {};'); " +
+            "module.exports." + variable + " = " + variable + ";"
+        )
     });
     return source;
 }

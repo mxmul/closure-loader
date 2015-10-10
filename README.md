@@ -105,6 +105,23 @@ Here are the configuration options specific for this loader:
   as default export for usage with babel. For this reason it will also export the corresponding flag
   `module.exports.__esModule = true`
   
+## Examples
+In the hopes of clarifying the usage of the loader a bit I have provided a couple of examples which 
+you can find in the `examples` directory. You can run all examples by first running `npm install` in
+their directory and than running the webpack dev-server via `npm start` or by building the example
+via `npm run build`
+- **common-js**: This example shows how to load some legacy code that contains `goog.provide()` and
+  `goog.require()` via commonJs `require()` calls.
+- **common-js-closure-lib**: This example shows how to load the closure library via commonJs 
+  `require()` calls.
+- **es6**: This example shows how to load some legacy code that contains `goog.provide()` and
+  `goog.require()` via babel and es6 `import` calls.
+- **es6-closure-lib**: This example shows how to load the closure library via babel and es6 
+  `import` calls.
+- **legacy-closure-lib**: This example shows how to load the closure library via your own `goog.require()`
+  calls. This is not advised. If you are using webpack you should think about using a proper module loader,
+  preferably es6 as this is now the standard.
+  
 ## License
   
 MIT (http://www.opensource.org/licenses/mit-license.php)
