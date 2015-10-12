@@ -31,8 +31,8 @@ module.exports = function (source, inputSourceMap) {
         if(inputSourceMap) {
             var currentRequest = loaderUtils.getCurrentRequest(this);
             var node = SourceNode.fromStringWithSourceMap(source, new SourceMapConsumer(inputSourceMap));
-            node.prepend(prefix.join(""));
-            node.add(postfix.join(""));
+            node.prepend(prefix.join("") + "\n");
+            node.add(";" + postfix.join(""));
             var result = node.toStringWithSourceMap({
                 file: currentRequest
             });
@@ -40,7 +40,7 @@ module.exports = function (source, inputSourceMap) {
             return;
         }
 
-        callback(null, prefix.join("") + source + postfix.join(""), inputSourceMap);
+        callback(null, prefix.join("") + source + ';' +  postfix.join(""), inputSourceMap);
     });
 };
 
