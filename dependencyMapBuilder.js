@@ -11,12 +11,13 @@ var _ = require('lodash'),
  * Fulfills in an object wich maps namespaces to file paths found in given
  * directories.
  *
- * @param {string[]} directories
+ * @param {string[]} directories Directories to be processed
+ * @param {boolean} watch Watch for changes is mapped files to invalidate cache
  * @returns {Promise}
  */
-module.exports = function (directories) {
+module.exports = function (directories, watch) {
     return Promise.map(directories, function(dir) {
-        return resolveAndCacheDirectory(dir)
+        return resolveAndCacheDirectory(dir, watch)
     }).then(function(results) {
         return _.assign.apply(_, results);
     })
@@ -30,10 +31,13 @@ module.exports = function (directories) {
  *
  * @returns {Promise}
  */
-function watch(directory) {
+function createWatchPromise(directory) {
     return new Promise(function(resolve, reject) {
         var watcher = chokidar.watch(directory)
             .on('ready', function() {
+                watcher.on('all', function() {
+                    delete cache[directory];
+                });
                 resolve(watcher);
             });
     });
@@ -47,17 +51,14 @@ function watch(directory) {
  * @param {string} directory
  * @returns {Promise}
  */
-function resolveAndCacheDirectory(directory) {
+function resolveAndCacheDirectory(directory, watch) {
 
     if (cache[directory]) {
         return cache[directory];
     }
 
-    cache[directory] = watch(directory)
-        .then(function(watcher) {
-            watcher.on('all', function() {
-                delete cache[directory];
-            });
+    cache[directory] = (watch ? createWatchPromise(directory) : Promise.resolve())
+        .then(function() {
             return glob(path.join(directory, '/**/*.js'));
         })
         .map(function(filePath) {

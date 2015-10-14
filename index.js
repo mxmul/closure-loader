@@ -5,7 +5,8 @@ var loaderUtils = require("loader-utils"),
     SourceMapConsumer = require("source-map").SourceMapConsumer,
     defaultConfig = config = {
         paths: [],
-        es6mode: false
+        es6mode: false,
+        watch: true
     },
     prefix, postfix;
 
@@ -23,7 +24,7 @@ module.exports = function (source, inputSourceMap) {
 
     config = buildConfig(query, this.options[query.config || "closureLoader"]);
 
-    mapBuilder(config.paths).then(function(provideMap) {
+    mapBuilder(config.paths, config.watch).then(function(provideMap) {
         source = processProvides(source, localVars, config.es6mode);
         source = processRequires(source, localVars, provideMap);
         createLocalVariables(localVars);
