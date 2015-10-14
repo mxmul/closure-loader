@@ -69,6 +69,7 @@ module(); // will output 'my module was loaded' to the console
 
 ## Configuration
 Here is an example webpack config for this loader:
+
 ```javascript
 module.exports = {
     entry: {
@@ -93,23 +94,30 @@ module.exports = {
         paths: [
             __dirname + '/src'
         ],
-        es6mode: true
+        es6mode: true,
+        watch: true
     }
 };
 ```
 
 Here are the configuration options specific for this loader:
+
 - **paths** (array): An array of path strings. The loader will search all `*.js` files within theses
   paths for `goog.provide()` statements.
 - **es6mode** (boolean, default: false): If enabled it will add the value of the first `goog.provide()`
   as default export for usage with babel. For this reason it will also export the corresponding flag
   `module.exports.__esModule = true`
+- **watch** (boolean, default: true): If true, the loader will intitialise watchers which check for
+  changes in the mapped files. This is neccesary to be able to delete the internal map cache. But
+  it also makes problems with CI sytstems and build scripts, because the watcher will prevent the
+  process from beeing exited.
   
 ## Examples
 In the hopes of clarifying the usage of the loader a bit I have provided a couple of examples which 
 you can find in the `examples` directory. You can run all examples by first running `npm install` in
 their directory and than running the webpack dev-server via `npm start` or by building the example
 via `npm run build`
+
 - **common-js**: This example shows how to load some legacy code that contains `goog.provide()` and
   `goog.require()` via commonJs `require()` calls.
 - **common-js-closure-lib**: This example shows how to load the closure library via commonJs 
