@@ -15,6 +15,7 @@ module.exports = function (source, inputSourceMap) {
     var query = loaderUtils.parseQuery(this.query),
         callback = this.async(),
         localVars = [],
+        processedSource = source,
         config;
 
     prefix = [];
@@ -25,8 +26,8 @@ module.exports = function (source, inputSourceMap) {
     config = buildConfig(query, this.options[query.config || "closureLoader"]);
 
     mapBuilder(config.paths, config.watch).then(function(provideMap) {
-        source = processProvides(source, localVars, config.es6mode);
-        source = processRequires(source, localVars, provideMap);
+        processedSource = processProvides(processedSource, localVars, config.es6mode);
+        processedSource = processRequires(processedSource, localVars, provideMap);
         createLocalVariables(localVars);
 
         if(inputSourceMap) {
@@ -37,11 +38,11 @@ module.exports = function (source, inputSourceMap) {
             var result = node.toStringWithSourceMap({
                 file: currentRequest
             });
-            callback(null, result.code, result.map.toJSON());
+            callback(null, processedSource, result.map.toJSON());
             return;
         }
 
-        callback(null, prefix.join("") + source + ';' +  postfix.join(""), inputSourceMap);
+        callback(null, prefix.join("") + processedSource + ';' +  postfix.join(""), inputSourceMap);
     });
 };
 
