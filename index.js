@@ -12,119 +12,144 @@ var loaderUtils = require("loader-utils"),
 
 
 module.exports = function (source, inputSourceMap) {
-    var query = loaderUtils.parseQuery(this.query),
+    var self = this,
+        query = loaderUtils.parseQuery(this.query),
         callback = this.async(),
-        localVars = [],
-        processedSource = source,
+        originalSource = source,
+        globalVars = [],
+        exportedVars = [],
         config;
-
-    prefix = [];
-    postfix = [];
 
     this.cacheable && this.cacheable();
 
     config = buildConfig(query, this.options[query.config || "closureLoader"]);
 
     mapBuilder(config.paths, config.watch).then(function(provideMap) {
-        processedSource = processProvides(processedSource, localVars, config.es6mode);
-        processedSource = processRequires(processedSource, localVars, provideMap);
-        createLocalVariables(localVars);
+        var provideRegExp = /goog\.provide *?\((['"])(.*)\1\);?/,
+            requireRegExp = /goog\.require *?\((['"])(.*)\1\);?/,
+            globalVarTree = {},
+            exportVarTree = {},
+            matches;
+
+        while (matches = provideRegExp.exec(source)) {
+            source = source.replace(new RegExp(escapeRegExp(matches[0]), 'g'), '');
+            globalVars.push(matches[2]);
+            exportedVars.push(matches[2]);
+        }
+
+        while (matches = requireRegExp.exec(source)) {
+            source = replaceRequire(source, matches[2], matches[0], provideMap);
+            globalVars.push(matches[2]);
+        }
+
+        globalVars = globalVars
+            .filter(deduplicate)
+            .map(buildVarTree(globalVarTree));
+
+        exportedVars = exportedVars
+            .filter(deduplicate)
+            .map(buildVarTree(exportVarTree));
+
+        prefix = createPrefix(globalVarTree);
+        postfix = createPostfix(exportVarTree, exportedVars, config);
 
         if(inputSourceMap) {
-            var currentRequest = loaderUtils.getCurrentRequest(this);
-            var node = SourceNode.fromStringWithSourceMap(source, new SourceMapConsumer(inputSourceMap));
-            node.prepend(prefix.join("") + "\n");
-            node.add(";" + postfix.join(""));
+            var currentRequest = loaderUtils.getCurrentRequest(self),
+                node = SourceNode.fromStringWithSourceMap(originalSource, new SourceMapConsumer(inputSourceMap));
+
+            node.prepend(prefix + "\n");
+            node.add(postfix);
             var result = node.toStringWithSourceMap({
                 file: currentRequest
             });
-            callback(null, processedSource, result.map.toJSON());
+
+            callback(null, source, result.map.toJSON());
             return;
         }
 
-        callback(null, prefix.join("") + processedSource + ';' +  postfix.join(""), inputSourceMap);
+        callback(null, prefix + "\n" + source + postfix, inputSourceMap);
     });
+
+
+    function escapeRegExp(string) {
+        return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    }
+
+    function replaceRequire(source, key, search, provideMap) {
+        var path;
+
+        if (!provideMap[key]) {
+            throw new Error("Can't find closure dependency " + key);
+        }
+
+        path = loaderUtils.stringifyRequest(self, provideMap[key]);
+        return source.replace(new RegExp(escapeRegExp(search), 'g'), key + '=require(' + path + ').' + key + ';');
+    }
+
+    function deduplicate(key, idx, arr) {
+        return arr.indexOf(key) === idx;
+    }
+
+    function buildVarTree(tree) {
+        return function (key) {
+            var layer = tree;
+            key.split('.').forEach(function (part) {
+                layer[part] = layer[part] || {};
+                layer = layer[part];
+            });
+            return key;
+        }
+    }
+
+    function enrichExport(object, path) {
+        path = path ? path + '.' : '';
+        Object.keys(object).forEach(function (key) {
+            var subPath = path + key;
+
+            if (Object.keys(object[key]).length) {
+                enrichExport(object[key], subPath);
+            } else {
+                object[key] = '%' + subPath + '%';
+            }
+        });
+    }
+
+    function buildConfig(query, options) {
+        return _.merge(_.clone(defaultConfig), options, query);
+    }
+
+    function createPostfix(exportVarTree, exportedVars, config) {
+        postfix = ';';
+        Object.keys(exportVarTree).forEach(function (rootVar) {
+            var jsonObj;
+            enrichExport(exportVarTree[rootVar], rootVar);
+            jsonObj = JSON.stringify(exportVarTree[rootVar]).replace(/(['"])%(.*?)%\1/g, '$2');
+            postfix += 'exports.' + rootVar + '=' + jsonObj + ';';
+        });
+
+        if (config.es6mode && exportedVars.length) {
+            postfix += 'exports.default=' + exportedVars.shift() + ';exports.__esModule=true;';
+        }
+
+        return postfix;
+    }
+
+    function createPrefix(globalVarTree) {
+        var merge = "var __merge=require(" + loaderUtils.stringifyRequest(self, require.resolve('deepmerge')) + ");";
+        prefix = '';
+        Object.keys(globalVarTree).forEach(function (rootVar) {
+            prefix += [
+                'var ',
+                rootVar,
+                '=__merge(',
+                rootVar,
+                '||{},',
+                JSON.stringify(globalVarTree[rootVar]),
+                ');'
+            ].join('');
+            //prefix += 'var ' + rootVar + '=' + rootVar + '||' + JSON.stringify(globalVarTree[rootVar]) + ';';
+        });
+
+        return merge + "eval('" +  prefix.replace(/'/g, "\\'") + "');";
+    }
 };
-
-function processProvides(source, localVars, es6mode) {
-    var provideRegExp = /goog\.provide\((['"])(([^.)]+)[^)]*)\1\)/g,
-        firstMatch,
-        possibleDefaults = [],
-        matches;
-
-    prependLine("var __googProvide = require('closure-loader/provide.js');");
-    prependLine("var __getDefault = require('closure-loader/getDefault.js');");
-
-    while (matches = provideRegExp.exec(source)) {
-        if (!firstMatch) {
-            firstMatch = matches[2];
-        }
-
-        possibleDefaults.push(matches[2]);
-
-        if (localVars.indexOf(matches[3]) < 0) {
-            localVars.push(matches[3]);
-        }
-
-        source = source.replace(matches[0], createProvide(matches[2], matches[3]));
-    }
-
-    if (es6mode && firstMatch) {
-        appendLine('module.exports.default = __getDefault(module.exports, "' + possibleDefaults.join('", "') + '");');
-        appendLine('module.exports.__esModule = true;');
-    }
-
-    return source;
-}
-
-function processRequires(source, localVars, provideMap) {
-    var requireRegExp = /goog\.require\((['"])(([^.)]+)[^)]*)\1\)/g,
-        isFirst = true,
-        matches;
-
-    while (matches = requireRegExp.exec(source)) {
-        if (isFirst) {
-            prependLine("var __googRequire = require('closure-loader/require.js');");
-            isFirst = false;
-        }
-        if (localVars.indexOf(matches[3]) < 0) {
-            localVars.push(matches[3]);
-        }
-        source = source.replace(matches[0], createRequire(matches[2], matches[3], provideMap));
-    }
-
-    return source;
-}
-
-function createLocalVariables(localVars) {
-    localVars.forEach(function (variable) {
-        prependLine(
-            "if(typeof " + variable + " === 'undefined') eval('var " + variable + " = {};'); " +
-            "module.exports." + variable + " = " + variable + ";"
-        )
-    });
-}
-
-function buildConfig(query, options) {
-    return _.merge(_.clone(defaultConfig), options, query);
-}
-
-function prependLine(line) {
-    prefix.push(line);
-}
-
-function appendLine(line) {
-    postfix.push(line);
-}
-
-function createProvide(key, localVar) {
-    return localVar + " = __googProvide('" + key + "', module.exports)";
-}
-
-function createRequire(key, localVar, provideMap) {
-    if (!provideMap[key]) {
-        throw new Error("Can't find closure dependency " + key);
-    }
-
-    return "__googRequire('" + key + "', " + localVar + "); " + key + " = require('" + provideMap[key] + "')." + key;
-}

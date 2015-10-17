@@ -27,7 +27,7 @@ module.exports = {
             {
                 test: /src\/legacyCode\/.*\.js/,
                 loaders: [
-                    'closure',
+                    require.resolve('../..'),
                 ],
                 exclude: [/test/, /node_modules/],
             },
@@ -44,6 +44,7 @@ module.exports = {
             __dirname + '/src/legacyCode',
         ],
         es6mode: false,
+        watch: false,
     },
     devServer: {
         contentBase: './build',

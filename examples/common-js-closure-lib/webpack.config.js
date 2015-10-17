@@ -34,7 +34,7 @@ module.exports = {
             {
                 test: /google-closure-library\/closure\/goog\/.*\.js/,
                 loaders: [
-                    'closure',
+                    require.resolve('../..'),
                 ],
             },
         ],
@@ -53,6 +53,7 @@ module.exports = {
             __dirname + '/node_modules/google-closure-library/closure/goog',
         ],
         es6mode: false,
+        watch: false,
     },
     devServer: {
         contentBase: './build',

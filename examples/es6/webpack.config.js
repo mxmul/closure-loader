@@ -27,7 +27,7 @@ module.exports = {
             {
                 test: /src\/legacyCode\/.*\.js/,
                 loaders: [
-                    'closure',
+                    require.resolve('../..'),
                 ],
                 exclude: [/test/, /node_modules/],
             },
