@@ -103,7 +103,8 @@ module.exports = {
 Here are the configuration options specific for this loader:
 
 - **paths** (array): An array of path strings. The loader will search all `*.js` files within theses
-  paths for `goog.provide()` statements.
+  paths for `goog.provide()` statements when resolving a `goog.require()`. You can only `goog.require()`
+  dependencies that can be found under one of these paths.
 - **es6mode** (boolean, default: false): If enabled it will add the value of the first `goog.provide()`
   as default export for usage with babel. For this reason it will also export the corresponding flag
   `module.exports.__esModule = true`
