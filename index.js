@@ -1,5 +1,5 @@
 var loaderUtils = require("loader-utils"),
-    _ = require('lodash'),
+    merge = require('deepmerge'),
     mapBuilder = require('./dependencyMapBuilder'),
     SourceNode = require("source-map").SourceNode,
     SourceMapConsumer = require("source-map").SourceMapConsumer,
@@ -22,7 +22,7 @@ module.exports = function (source, inputSourceMap) {
 
     this.cacheable && this.cacheable();
 
-    config = buildConfig(query, this.options[query.config || "closureLoader"]);
+    config = merge(defaultConfig, this.options[query.config || "closureLoader"], query);
 
     mapBuilder(config.paths, config.watch).then(function(provideMap) {
         var provideRegExp = /goog\.provide *?\((['"])(.*)\1\);?/,
@@ -70,11 +70,25 @@ module.exports = function (source, inputSourceMap) {
         callback(null, prefix + "\n" + source + postfix, inputSourceMap);
     });
 
-
+    /**
+     * Escape a string for usage in a regular expression
+     *
+     * @param {string} string
+     * @returns {string}
+     */
     function escapeRegExp(string) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
 
+    /**
+     * Replace a given goog.require() with a CommonJS require() call.
+     *
+     * @param {string} source
+     * @param {string} key
+     * @param {string} search
+     * @param {Object} provideMap
+     * @returns {string}
+     */
     function replaceRequire(source, key, search, provideMap) {
         var path;
 
@@ -86,10 +100,26 @@ module.exports = function (source, inputSourceMap) {
         return source.replace(new RegExp(escapeRegExp(search), 'g'), key + '=require(' + path + ').' + key + ';');
     }
 
+    /**
+     * Array filter function to remove duplicates
+     *
+     * @param {string} key
+     * @param {number} idx
+     * @param {Array} arr
+     * @returns {boolean}
+     */
     function deduplicate(key, idx, arr) {
         return arr.indexOf(key) === idx;
     }
 
+    /**
+     * Creates a function that extends an object based on an array of keys
+     *
+     * Example: `['abc.def', 'abc.def.ghi', 'jkl.mno']` will become `{abc: {def: {ghi: {}}, jkl: {mno: {}}}`
+     *
+     * @param {Object} tree - the object to extend
+     * @returns {Function} The filter function to be called in forEach
+     */
     function buildVarTree(tree) {
         return function (key) {
             var layer = tree;
@@ -101,23 +131,17 @@ module.exports = function (source, inputSourceMap) {
         }
     }
 
-    function enrichExport(object, path) {
-        path = path ? path + '.' : '';
-        Object.keys(object).forEach(function (key) {
-            var subPath = path + key;
-
-            if (Object.keys(object[key]).length) {
-                enrichExport(object[key], subPath);
-            } else {
-                object[key] = '%' + subPath + '%';
-            }
-        });
-    }
-
-    function buildConfig(query, options) {
-        return _.merge(_.clone(defaultConfig), options, query);
-    }
-
+    /**
+     * Create a string which will be injected after the actual module code
+     *
+     * This will create export statements for all provided namespaces as well as the default
+     * export if es6mode is active.
+     *
+     * @param {Object} exportVarTree
+     * @param {Array} exportedVars
+     * @param {Object} config
+     * @returns {string}
+     */
     function createPostfix(exportVarTree, exportedVars, config) {
         postfix = ';';
         Object.keys(exportVarTree).forEach(function (rootVar) {
@@ -134,6 +158,20 @@ module.exports = function (source, inputSourceMap) {
         return postfix;
     }
 
+    /**
+     * Create a string to inject before the actual module code
+     *
+     * This will create all provided or required namespaces. It will merge those namespaces into an existing
+     * object if existent. The declarations will be executed via eval because other plugins or loaders like
+     * the ProvidePLugin will see that a variable is created and might not work as expected.
+     *
+     * Example: If you require or provide a namespace under 'goog' and have the closure library export
+     * its global goog object and use that via ProvidePlugin, the plugin wouldn't inject the goog variable
+     * into a module that creates its own goog variables. That's why it has to be executed in eval.
+     *
+     * @param globalVarTree
+     * @returns {string}
+     */
     function createPrefix(globalVarTree) {
         var merge = "var __merge=require(" + loaderUtils.stringifyRequest(self, require.resolve('deepmerge')) + ");";
         prefix = '';
@@ -147,8 +185,29 @@ module.exports = function (source, inputSourceMap) {
                 JSON.stringify(globalVarTree[rootVar]),
                 ');'
             ].join('');
-            //prefix += 'var ' + rootVar + '=' + rootVar + '||' + JSON.stringify(globalVarTree[rootVar]) + ';';
         });
+
+        /**
+         * Replace all empty objects in an object tree with a special formatted string containing the path
+         * of that empty object in the tree
+         *
+         * Example: `{abc: {def: {}}}` will become `{abc: {def: "%abc.def%"}}`
+         *
+         * @param {Object} object - The object tree to enhance
+         * @param {string} path - The base path for the given object
+         */
+        function enrichExport(object, path) {
+            path = path ? path + '.' : '';
+            Object.keys(object).forEach(function (key) {
+                var subPath = path + key;
+
+                if (Object.keys(object[key]).length) {
+                    enrichExport(object[key], subPath);
+                } else {
+                    object[key] = '%' + subPath + '%';
+                }
+            });
+        }
 
         return merge + "eval('" +  prefix.replace(/'/g, "\\'") + "');";
     }
