@@ -187,28 +187,28 @@ module.exports = function (source, inputSourceMap) {
             ].join('');
         });
 
-        /**
-         * Replace all empty objects in an object tree with a special formatted string containing the path
-         * of that empty object in the tree
-         *
-         * Example: `{abc: {def: {}}}` will become `{abc: {def: "%abc.def%"}}`
-         *
-         * @param {Object} object - The object tree to enhance
-         * @param {string} path - The base path for the given object
-         */
-        function enrichExport(object, path) {
-            path = path ? path + '.' : '';
-            Object.keys(object).forEach(function (key) {
-                var subPath = path + key;
-
-                if (Object.keys(object[key]).length) {
-                    enrichExport(object[key], subPath);
-                } else {
-                    object[key] = '%' + subPath + '%';
-                }
-            });
-        }
-
         return merge + "eval('" +  prefix.replace(/'/g, "\\'") + "');";
+    }
+
+    /**
+     * Replace all empty objects in an object tree with a special formatted string containing the path
+     * of that empty object in the tree
+     *
+     * Example: `{abc: {def: {}}}` will become `{abc: {def: "%abc.def%"}}`
+     *
+     * @param {Object} object - The object tree to enhance
+     * @param {string} path - The base path for the given object
+     */
+    function enrichExport(object, path) {
+        path = path ? path + '.' : '';
+        Object.keys(object).forEach(function (key) {
+            var subPath = path + key;
+
+            if (Object.keys(object[key]).length) {
+                enrichExport(object[key], subPath);
+            } else {
+                object[key] = '%' + subPath + '%';
+            }
+        });
     }
 };
