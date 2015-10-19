@@ -163,7 +163,7 @@ module.exports = function (source, inputSourceMap) {
      *
      * This will create all provided or required namespaces. It will merge those namespaces into an existing
      * object if existent. The declarations will be executed via eval because other plugins or loaders like
-     * the ProvidePLugin will see that a variable is created and might not work as expected.
+     * the ProvidePlugin will see that a variable is created and might not work as expected.
      *
      * Example: If you require or provide a namespace under 'goog' and have the closure library export
      * its global goog object and use that via ProvidePlugin, the plugin wouldn't inject the goog variable
