@@ -17,18 +17,18 @@ There are two parts to this loader:
     - Basically just creates the given namespace in the local scope of that module
     - Any file containing this statement will be added to a map for require lookups
 - `goog.require()`
-    - Like `goog.provide()` it creates the given namespace in the scope of that module 
+    - Like `goog.provide()` it creates the given namespace in the scope of that module
     - It finds the corresponding file with the `goog.provide()` statement and loads it (see configuration below)
     - It assigns the value of the namespace from the provide file and assign it to the same
       namespace in the current module
-      
+
 In the simplest way you can just use those two statements like you usually would with the google closure library.
 
 **NOTE**: Usually the closure lib simply creates all namespaces on the **global** scope (i.e. the window object).
 This is **not** the case if you use this loader. Every file ("module") has its own scope just like it would have
 if you used CommonJS syntax.
 
-You can use closure library dependencies in conjunction with CommonJS syntax. You can load any module that uses 
+You can use closure library dependencies in conjunction with CommonJS syntax. You can load any module that uses
 `goog.provide()` with `require()`, but not the other way round.
 
 ```javascript
@@ -112,25 +112,27 @@ Here are the configuration options specific for this loader:
   changes in the mapped files. This is neccesary to be able to delete the internal map cache. But
   it also makes problems with CI sytstems and build scripts, because the watcher will prevent the
   process from beeing exited.
-  
+
 ## Examples
-In the hopes of clarifying the usage of the loader a bit I have provided a couple of examples which 
+In the hopes of clarifying the usage of the loader a bit I have provided a couple of examples which
 you can find in the `examples` directory. You can run all examples by first running `npm install` in
 their directory and than running the webpack dev-server via `npm start` or by building the example
 via `npm run build`
 
 - **common-js**: This example shows how to load some legacy code that contains `goog.provide()` and
   `goog.require()` via commonJs `require()` calls.
-- **common-js-closure-lib**: This example shows how to load the closure library via commonJs 
+- **common-js-closure-lib**: This example shows how to load the closure library via commonJs
   `require()` calls.
 - **es6**: This example shows how to load some legacy code that contains `goog.provide()` and
   `goog.require()` via babel and es6 `import` calls.
-- **es6-closure-lib**: This example shows how to load the closure library via babel and es6 
+- **es6-closure-lib**: This example shows how to load the closure library via babel and es6
   `import` calls.
 - **legacy-closure-lib**: This example shows how to load the closure library via your own `goog.require()`
   calls. This is not advised. If you are using webpack you should think about using a proper module loader,
   preferably es6 as this is now the standard.
-  
+
+**NOTE**: This loader does in no way include or wrap the actual google closure library. If you want to use the closure library you will have to include it yourself and ensure correct shimming. See the above examples on how this can be done.
+
 ## License
-  
+
 MIT (http://www.opensource.org/licenses/mit-license.php)

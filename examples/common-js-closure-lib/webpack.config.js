@@ -27,6 +27,7 @@ module.exports = {
             {
                 test: /google-closure-library\/closure\/goog\/base/,
                 loaders: [
+                    'imports?this=>{goog:{}}&goog=>this.goog',
                     'exports?goog',
                 ],
             },
@@ -34,8 +35,9 @@ module.exports = {
             {
                 test: /google-closure-library\/closure\/goog\/.*\.js/,
                 loaders: [
-                    require.resolve('../..'),
+                    require.resolve('../../index'),
                 ],
+                exclude: [/base\.js$/],
             },
         ],
     },

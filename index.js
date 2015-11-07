@@ -48,6 +48,7 @@ module.exports = function (source, inputSourceMap) {
 
         exportedVars = exportedVars
             .filter(deduplicate)
+            .filter(removeNested)
             .map(buildVarTree(exportVarTree));
 
         prefix = createPrefix(globalVarTree);
@@ -63,7 +64,7 @@ module.exports = function (source, inputSourceMap) {
                 file: currentRequest
             });
 
-            callback(null, source, result.map.toJSON());
+            callback(null, prefix + "\n" + source + postfix, result.map.toJSON());
             return;
         }
 
@@ -110,6 +111,31 @@ module.exports = function (source, inputSourceMap) {
      */
     function deduplicate(key, idx, arr) {
         return arr.indexOf(key) === idx;
+    }
+
+    /**
+     * Array filter function to remove vars which already have a parent exposed
+     *
+     * Example: Remove a.b.c if a.b exists in the array
+     *
+     * @param {[type]} key [description]
+     * @param {[type]} idx [description]
+     * @param {[type]} arr [description]
+     *
+     * @returns {[type]} [description]
+     */
+    function removeNested(key, idx, arr) {
+        var foundParent = false;
+
+        key.split('.')
+            .forEach(function (subKey, subIdx, keyParts) {
+                var parentKey;
+                if(subIdx === (keyParts.length - 1)) return;
+                parentKey = keyParts.slice(0, subIdx + 1).join('.');
+                foundParent = foundParent || arr.indexOf(parentKey) >= 0;
+            });
+
+        return !foundParent;
     }
 
     /**
