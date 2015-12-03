@@ -1,5 +1,7 @@
 # Closure library dependency loader for [Webpack](http://webpack.github.io/)
 
+[![Join the chat at https://gitter.im/eXaminator/closure-loader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/eXaminator/closure-loader?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is a webpack loader which resolves `goog.provide()` and `goog.require()` statements in webpack
 just like if they were regular CommonJS modules.
 
