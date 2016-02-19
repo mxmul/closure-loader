@@ -119,10 +119,14 @@ Here are the configuration options specific for this loader:
 
 ## Examples
 In the hopes of clarifying the usage of the loader a bit I have provided a couple of examples which
-you can find in the `examples` directory. You can run all examples by first running `npm install` in
-their directory and than running the webpack dev-server via `npm start` or by building the example
-via `npm run build`
+you can find in the `examples` directory.
 
+To run an example please follow these steps:
+- `npm install` in the closure-loader root directory
+- `npm install` in the directory of the example
+- `npm start` or `npm run build` in the directory of the example
+
+The following examples are available:
 - **common-js**: This example shows how to load some legacy code that contains `goog.provide()` and
   `goog.require()` via commonJs `require()` calls.
 - **common-js-closure-lib**: This example shows how to load the closure library via commonJs
