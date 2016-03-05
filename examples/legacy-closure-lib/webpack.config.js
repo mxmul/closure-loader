@@ -43,7 +43,7 @@ module.exports = {
             {
                 test: /\/src\/.*\.js/,
                 loaders: [
-                    'closure',
+                    require.resolve('../../index'),
                 ],
                 exclude: [/node_modules/, /test/],
             },
