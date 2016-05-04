@@ -69,6 +69,8 @@ module.exports = function (source, inputSourceMap) {
         }
 
         callback(null, prefix + "\n" + source + postfix, inputSourceMap);
+    }).catch(function(error) {
+      callback(error);
     });
 
     /**
