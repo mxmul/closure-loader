@@ -38,8 +38,8 @@ module.exports = function (source, inputSourceMap) {
         }
 
         while (matches = requireRegExp.exec(source)) {
-            source = replaceRequire(source, matches[2], matches[0], provideMap);
             globalVars.push(matches[2]);
+            source = replaceRequire(source, matches[2], matches[0], provideMap, exportedVars);
         }
 
         globalVars = globalVars
@@ -92,7 +92,7 @@ module.exports = function (source, inputSourceMap) {
      * @param {Object} provideMap
      * @returns {string}
      */
-    function replaceRequire(source, key, search, provideMap) {
+    function replaceRequire(source, key, search, provideMap, exportedVars) {
         var path;
 
         if (!provideMap[key]) {
@@ -100,7 +100,25 @@ module.exports = function (source, inputSourceMap) {
         }
 
         path = loaderUtils.stringifyRequest(self, provideMap[key]);
-        return source.replace(new RegExp(escapeRegExp(search), 'g'), key + '=require(' + path + ').' + key + ';');
+
+        // if the required module is a parent of a provided module, use deepmerge so that injected
+        // namespaces are not overwritten
+        var isParent = false;
+        var isParentRegExp = new RegExp('^' + key.replace('.', '\\.', 'g'));
+        for (var i=0; i<exportedVars.length; i++) {
+          if (isParentRegExp.test(exportedVars[i])) {
+            isParent = true;
+            continue;
+          }
+        }
+        if (isParent) {
+          return source.replace(
+            new RegExp(escapeRegExp(search), 'g'),
+            key + '=__merge(require(' + path + ').' + key + ', (' + key + ' || {}));'
+          );
+        } else {
+          return source.replace(new RegExp(escapeRegExp(search), 'g'), key + '=require(' + path + ').' + key + ';');
+        }
     }
 
     /**
