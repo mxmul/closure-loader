@@ -83,6 +83,14 @@ module.exports = function (source, inputSourceMap) {
         return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
 
+    function isParent(key, exportedVars) {
+        var isParent = false;
+        var isParentRegExp = new RegExp('^' + key.replace('.', '\\.', 'g'));
+        for (var i=0; i < exportedVars.length; i++) {
+            if (isParentRegExp.test(exportedVars[i])) return true;
+        }
+    }
+
     /**
      * Replace a given goog.require() with a CommonJS require() call.
      *
@@ -93,31 +101,22 @@ module.exports = function (source, inputSourceMap) {
      * @returns {string}
      */
     function replaceRequire(source, key, search, provideMap, exportedVars) {
-        var path;
+        var replaceRegex = new RegExp(escapeRegExp(search), 'g');
+        var path, requireString;
 
         if (!provideMap[key]) {
             throw new Error("Can't find closure dependency " + key);
         }
 
         path = loaderUtils.stringifyRequest(self, provideMap[key]);
+        requireString = 'require(' + path + ').' + key;
 
         // if the required module is a parent of a provided module, use deepmerge so that injected
         // namespaces are not overwritten
-        var isParent = false;
-        var isParentRegExp = new RegExp('^' + key.replace('.', '\\.', 'g'));
-        for (var i=0; i<exportedVars.length; i++) {
-          if (isParentRegExp.test(exportedVars[i])) {
-            isParent = true;
-            continue;
-          }
-        }
-        if (isParent) {
-          return source.replace(
-            new RegExp(escapeRegExp(search), 'g'),
-            key + '=__merge(require(' + path + ').' + key + ', (' + key + ' || {}));'
-          );
+        if (isParent(key, exportedVars)) {
+          return source.replace(replaceRegex, key + '=__merge(' + requireString + ', (' + key + ' || {}));');
         } else {
-          return source.replace(new RegExp(escapeRegExp(search), 'g'), key + '=require(' + path + ').' + key + ';');
+          return source.replace(replaceRegex, key + '=' + requireString + ';');
         }
     }
 
