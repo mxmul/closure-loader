@@ -25,8 +25,8 @@ module.exports = function (source, inputSourceMap) {
     config = merge(defaultConfig, this.options[query.config || "closureLoader"], query);
 
     mapBuilder(config.paths, config.watch).then(function(provideMap) {
-        var provideRegExp = /goog\.provide *?\((['"])(.*)\1\);?/,
-            requireRegExp = /goog\.require *?\((['"])(.*)\1\);?/,
+        var provideRegExp = /goog\.provide *?\((['"])(.*?)\1\);?/,
+            requireRegExp = /goog\.require *?\((['"])(.*?)\1\);?/,
             globalVarTree = {},
             exportVarTree = {},
             matches;
