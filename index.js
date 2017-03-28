@@ -85,7 +85,7 @@ module.exports = function (source, inputSourceMap) {
 
     function isParent(key, exportedVars) {
         var isParent = false;
-        var isParentRegExp = new RegExp('^' + key.replace('.', '\\.', 'g'));
+        var isParentRegExp = new RegExp('^' + key.split('.').join('\\.') + '\\.');
         for (var i=0; i < exportedVars.length; i++) {
             if (isParentRegExp.test(exportedVars[i])) return true;
         }
