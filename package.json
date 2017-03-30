@@ -1,6 +1,6 @@
 {
-  "name": "closure-loader",
-  "version": "0.1.14",
+  "name": "configurator-closure-loader",
+  "version": "0.1.15",
   "description": "Webpack loader for google closure library dependencies",
   "main": "index.js",
   "scripts": {
@@ -13,16 +13,17 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/eXaminator/closure-loader.git"
+    "url": "git://github.com/configurator/closure-loader.git"
   },
   "author": "Steven Weingärtner",
   "contributors": [
     "Michael van Engelshoven <michael@van-engelshoven.de>",
-    "Matthias Harmuth <mcpain83@gmail.com>"
+    "Matthias Harmuth <mcpain83@gmail.com>",
+	"Dor Kleiman <configurator@gmail.com>"
   ],
   "license": "MIT",
   "peerDependencies": {
-    "webpack": "^1.9.10"
+    "webpack": "^2.3.2"
   },
   "dependencies": {
     "bluebird": "^3.4.1",
