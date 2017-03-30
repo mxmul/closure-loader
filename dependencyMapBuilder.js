@@ -4,7 +4,9 @@ var _ = require('lodash'),
     Promise = require('bluebird'),
     cache = {},
     glob = Promise.promisify(require('glob')),
-    readFile = Promise.promisify(require('graceful-fs').readFile),
+    fs = require('graceful-fs'),
+    lstat = Promise.promisify(fs.lstat),
+    readFile = Promise.promisify(fs.readFile),
     provideRegExp = /goog\.provide\((['"])(([^.)]+)[^)]*)\1\)/g;
 
 /**
@@ -79,11 +81,17 @@ function resolveAndCacheDirectory(directory, watch) {
  * @returns {Promise}
  */
 function findProvideCalls(filePath) {
-    return readFile(filePath).then(function(fileContent) {
-        var result = {};
-        while (matches = provideRegExp.exec(fileContent)) {
-            result[matches[2]] = filePath;
+    return lstat(filePath).then(function (stats) {
+        if (!stats.isFile()) {
+            return {};
         }
-        return result;
+
+        return readFile(filePath).then(function(fileContent) {
+            var result = {};
+            while (matches = provideRegExp.exec(fileContent)) {
+                result[matches[2]] = filePath;
+            }
+            return result;
+        });
     });
 }
