@@ -1,5 +1,5 @@
 var loaderUtils = require("loader-utils"),
-    merge = require('deepmerge'),
+	merge = require('deep-extend'),
     mapBuilder = require('./dependencyMapBuilder'),
     SourceNode = require("source-map").SourceNode,
     SourceMapConsumer = require("source-map").SourceMapConsumer,
@@ -22,8 +22,7 @@ module.exports = function (source, inputSourceMap) {
 
     this.cacheable && this.cacheable();
 
-    config = merge(this.options[query.config || "closureLoader"] || {}, defaultConfig || {});
-	config = merge(query || {}, config);
+    config = merge({}, defaultConfig, this.options[query.config || "closureLoader"], query);
 
     mapBuilder(config.paths, config.watch).then(function(provideMap) {
         var provideRegExp = /goog\.provide *?\((['"])(.*?)\1\);?/,
@@ -112,7 +111,7 @@ module.exports = function (source, inputSourceMap) {
         path = loaderUtils.stringifyRequest(self, provideMap[key]);
         requireString = 'require(' + path + ').' + key;
 
-        // if the required module is a parent of a provided module, use deepmerge so that injected
+        // if the required module is a parent of a provided module, use deep-extend so that injected
         // namespaces are not overwritten
         if (isParent(key, exportedVars)) {
           return source.replace(replaceRegex, key + '=__merge(' + requireString + ', (' + key + ' || {}));');
@@ -219,7 +218,7 @@ module.exports = function (source, inputSourceMap) {
      * @returns {string}
      */
     function createPrefix(globalVarTree) {
-        var merge = "var __merge=require(" + loaderUtils.stringifyRequest(self, require.resolve('deepmerge')) + ");";
+        var merge = "var __merge=require(" + loaderUtils.stringifyRequest(self, require.resolve('deep-extend')) + ");";
         prefix = '';
         Object.keys(globalVarTree).forEach(function (rootVar) {
             prefix += [
