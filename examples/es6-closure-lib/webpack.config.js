@@ -9,6 +9,7 @@ module.exports = {
     output: {
         path: './build',
         filename: '[name].js',
+        publicPath: '',
     },
     resolve: {
         modulesDirectories: ['node_modules'],
