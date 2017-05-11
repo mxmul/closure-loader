@@ -14,12 +14,16 @@ var loaderUtils = require("loader-utils"),
 
 module.exports = function (source, inputSourceMap) {
     var self = this,
-        query = loaderUtils.parseQuery(this.query),
+        query = this.query,
         callback = this.async(),
         originalSource = source,
         globalVars = [],
         exportedVars = [],
         config;
+
+    if (typeof query === 'string' &&  query.length > 0) {
+        query = loaderUtils.parseQuery(this.query);
+    }
 
     this.cacheable && this.cacheable();
 

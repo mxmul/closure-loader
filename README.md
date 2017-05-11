@@ -138,6 +138,8 @@ The following examples are available:
   `goog.require()` via babel and es6 `import` calls.
 - **es6-closure-lib**: This example shows how to load the closure library via babel and es6
   `import` calls.
+- **es6-fileext**: Demonstrates how different filetypes can be used using the fileExt option.
+- **es6-webpack2**: Demonstrates how this loader can be used with webpack2
 - **legacy-closure-lib**: This example shows how to load the closure library via your own `goog.require()`
   calls. This is not advised. If you are using webpack you should think about using a proper module loader,
   preferably es6 as this is now the standard.

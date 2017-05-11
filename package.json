@@ -22,16 +22,16 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "webpack": "^1.9.10"
+    "webpack": "^1.9.10 || ^2.0.0"
   },
   "dependencies": {
-    "bluebird": "^3.4.1",
-    "chokidar": "^1.0.6",
-    "deep-extend": "^0.2.11",
-    "glob": "^7.0.5",
-    "graceful-fs": "^4.1.2",
-    "loader-utils": "^0.2.11",
-    "lodash": "^4.13.1",
+    "bluebird": "^3.5.0",
+    "chokidar": "^1.7.0",
+    "deep-extend": "^0.5.0",
+    "glob": "^7.1.1",
+    "graceful-fs": "^4.1.11",
+    "loader-utils": "^1.1.0",
+    "lodash": "^4.17.4",
     "source-map": "^0.5.1"
   }
 }
