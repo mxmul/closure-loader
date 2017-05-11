@@ -99,7 +99,8 @@ module.exports = {
             __dirname + '/src'
         ],
         es6mode: true,
-        watch: true
+        watch: true,
+        fileExt: '.js'
     }
 };
 ```
@@ -116,6 +117,8 @@ Here are the configuration options specific for this loader:
   changes in the mapped files. This is neccesary to be able to delete the internal map cache. But
   it also makes problems with CI sytstems and build scripts, because the watcher will prevent the
   process from beeing exited.
+- **fileExt** (string, default: '.js'): Files extension which will be searched for dependency resolving. 
+  Support [glob](https://github.com/isaacs/node-glob) pattern syntax.
 
 ## Examples
 In the hopes of clarifying the usage of the loader a bit I have provided a couple of examples which

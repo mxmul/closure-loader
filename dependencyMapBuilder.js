@@ -15,11 +15,12 @@ var _ = require('lodash'),
  *
  * @param {string[]} directories Directories to be processed
  * @param {boolean} watch Watch for changes is mapped files to invalidate cache
+ * @param {string} fileExt Searched file extensions
  * @returns {Promise}
  */
-module.exports = function (directories, watch) {
+module.exports = function (directories, watch, fileExt) {
     return Promise.map(directories, function(dir) {
-        return resolveAndCacheDirectory(dir, watch)
+        return resolveAndCacheDirectory(dir, watch, fileExt)
     }).then(function(results) {
         return _.assign.apply(_, results);
     })
@@ -51,9 +52,11 @@ function createWatchPromise(directory) {
  * in this directory and deletes the cached object.
  *
  * @param {string} directory
+ * @param {boolean} watch Watch for changes is mapped files to invalidate cache
+ * @param {string} fileExt Searched file extensions
  * @returns {Promise}
  */
-function resolveAndCacheDirectory(directory, watch) {
+function resolveAndCacheDirectory(directory, watch, fileExt) {
 
     if (cache[directory]) {
         return cache[directory];
@@ -61,7 +64,7 @@ function resolveAndCacheDirectory(directory, watch) {
 
     cache[directory] = (watch ? createWatchPromise(directory) : Promise.resolve())
         .then(function() {
-            return glob(path.join(directory, '/**/*.js'));
+            return glob(path.join(directory, '/**/*' + fileExt));
         })
         .map(function(filePath) {
             return findProvideCalls(filePath);

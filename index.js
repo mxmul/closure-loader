@@ -6,7 +6,8 @@ var loaderUtils = require("loader-utils"),
     defaultConfig = config = {
         paths: [],
         es6mode: false,
-        watch: true
+        watch: true,
+        fileExt: '.js'
     },
     prefix, postfix;
 
@@ -24,7 +25,7 @@ module.exports = function (source, inputSourceMap) {
 
     config = merge({}, defaultConfig, this.options[query.config || "closureLoader"], query);
 
-    mapBuilder(config.paths, config.watch).then(function(provideMap) {
+    mapBuilder(config.paths, config.watch, config.fileExt).then(function(provideMap) {
         var provideRegExp = /goog\.provide *?\((['"])(.*?)\1\);?/,
             requireRegExp = /goog\.require *?\((['"])(.*?)\1\);?/,
             globalVarTree = {},
