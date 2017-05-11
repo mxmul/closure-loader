@@ -1,30 +1,35 @@
 var loaderUtils = require("loader-utils"),
-    merge = require('deepmerge'),
+	merge = require('deep-extend'),
     mapBuilder = require('./dependencyMapBuilder'),
     SourceNode = require("source-map").SourceNode,
     SourceMapConsumer = require("source-map").SourceMapConsumer,
     defaultConfig = config = {
         paths: [],
         es6mode: false,
-        watch: true
+        watch: true,
+        fileExt: '.js'
     },
     prefix, postfix;
 
 
 module.exports = function (source, inputSourceMap) {
     var self = this,
-        query = loaderUtils.parseQuery(this.query),
+        query = this.query,
         callback = this.async(),
         originalSource = source,
         globalVars = [],
         exportedVars = [],
         config;
 
+    if (typeof query === 'string' &&  query.length > 0) {
+        query = loaderUtils.parseQuery(this.query);
+    }
+
     this.cacheable && this.cacheable();
 
-    config = merge(defaultConfig, this.options[query.config || "closureLoader"], query);
+    config = merge({}, defaultConfig, this.options[query.config || "closureLoader"], query);
 
-    mapBuilder(config.paths, config.watch).then(function(provideMap) {
+    mapBuilder(config.paths, config.watch, config.fileExt).then(function(provideMap) {
         var provideRegExp = /goog\.provide *?\((['"])(.*?)\1\);?/,
             requireRegExp = /goog\.require *?\((['"])(.*?)\1\);?/,
             globalVarTree = {},
@@ -85,7 +90,7 @@ module.exports = function (source, inputSourceMap) {
 
     function isParent(key, exportedVars) {
         var isParent = false;
-        var isParentRegExp = new RegExp('^' + key.replace('.', '\\.', 'g'));
+        var isParentRegExp = new RegExp('^' + key.split('.').join('\\.') + '\\.');
         for (var i=0; i < exportedVars.length; i++) {
             if (isParentRegExp.test(exportedVars[i])) return true;
         }
@@ -111,7 +116,7 @@ module.exports = function (source, inputSourceMap) {
         path = loaderUtils.stringifyRequest(self, provideMap[key]);
         requireString = 'require(' + path + ').' + key;
 
-        // if the required module is a parent of a provided module, use deepmerge so that injected
+        // if the required module is a parent of a provided module, use deep-extend so that injected
         // namespaces are not overwritten
         if (isParent(key, exportedVars)) {
           return source.replace(replaceRegex, key + '=__merge(' + requireString + ', (' + key + ' || {}));');
@@ -218,7 +223,7 @@ module.exports = function (source, inputSourceMap) {
      * @returns {string}
      */
     function createPrefix(globalVarTree) {
-        var merge = "var __merge=require(" + loaderUtils.stringifyRequest(self, require.resolve('deepmerge')) + ");";
+        var merge = "var __merge=require(" + loaderUtils.stringifyRequest(self, require.resolve('deep-extend')) + ");";
         prefix = '';
         Object.keys(globalVarTree).forEach(function (rootVar) {
             prefix += [

@@ -99,7 +99,8 @@ module.exports = {
             __dirname + '/src'
         ],
         es6mode: true,
-        watch: true
+        watch: true,
+        fileExt: '.js'
     }
 };
 ```
@@ -116,6 +117,8 @@ Here are the configuration options specific for this loader:
   changes in the mapped files. This is neccesary to be able to delete the internal map cache. But
   it also makes problems with CI sytstems and build scripts, because the watcher will prevent the
   process from beeing exited.
+- **fileExt** (string, default: '.js'): Files extension which will be searched for dependency resolving. 
+  Support [glob](https://github.com/isaacs/node-glob) pattern syntax.
 
 ## Examples
 In the hopes of clarifying the usage of the loader a bit I have provided a couple of examples which
@@ -135,6 +138,8 @@ The following examples are available:
   `goog.require()` via babel and es6 `import` calls.
 - **es6-closure-lib**: This example shows how to load the closure library via babel and es6
   `import` calls.
+- **es6-fileext**: Demonstrates how different filetypes can be used using the fileExt option.
+- **es6-webpack2**: Demonstrates how this loader can be used with webpack2
 - **legacy-closure-lib**: This example shows how to load the closure library via your own `goog.require()`
   calls. This is not advised. If you are using webpack you should think about using a proper module loader,
   preferably es6 as this is now the standard.

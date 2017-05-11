@@ -1,10 +1,9 @@
 var HtmlWebpackPlugin = require('html-webpack-plugin'),
-    webpack = require('webpack'),
     pathUtil = require('path');
 
 module.exports = {
     entry: {
-        app: './src/app.js',
+        app: './src/app.js'
     },
     output: {
         path: './build',
@@ -25,20 +24,13 @@ module.exports = {
     },
     module: {
         loaders: [
+            // Loader for legacy google closure code
             {
-                test: /google-closure-library\/closure\/goog\/base/,
+                test: /src\/legacyCode\/.*\.(js|es6)/,
                 loaders: [
-                    'imports?this=>{goog:{}}&goog=>this.goog',
-                    'exports?goog',
+                    require.resolve('../..'),
                 ],
-            },
-            // Loader for closure library
-            {
-                test: /google-closure-library\/closure\/goog\/.*\.js/,
-                loaders: [
-                    require.resolve('../../index'),
-                ],
-                exclude: [/google-closure-library\/closure\/goog\/base\.js$/],
+                exclude: [/test/, /node_modules/],
             },
             // Loader for project js files
             {
@@ -46,7 +38,7 @@ module.exports = {
                 loaders: [
                     'babel?stage=0',
                 ],
-                exclude: [/node_modules/, /test/],
+                exclude: [/node_modules/, /test/, /legacyCode/],
             },
         ],
     },
@@ -55,16 +47,13 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: 'src/index.html',
         }),
-        new webpack.ProvidePlugin({
-            goog: 'google-closure-library/closure/goog/base',
-        }),
     ],
     closureLoader: {
         paths: [
-            __dirname + '/node_modules/google-closure-library/closure/goog',
+            __dirname + '/src/legacyCode',
         ],
         es6mode: true,
-        watch: false,
+        fileExt: '.{js,es6}'
     },
     devServer: {
         contentBase: './build',

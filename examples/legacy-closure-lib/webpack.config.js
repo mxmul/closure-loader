@@ -9,6 +9,7 @@ module.exports = {
     output: {
         path: './build',
         filename: '[name].js',
+        publicPath: '',
     },
     resolve: {
         modulesDirectories: ['node_modules'],
@@ -37,7 +38,7 @@ module.exports = {
                 loaders: [
                     require.resolve('../../index'),
                 ],
-                exclude: [/base\.js$/],
+                exclude: [/google-closure-library\/closure\/goog\/base\.js$/],
             },
             // Loader for project js files
             {
