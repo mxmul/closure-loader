@@ -22,7 +22,7 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "webpack": "^1.9.10 || ^2.0.0"
+    "webpack": "^1.9.10 || ^2.0.0 || ^3.0.0"
   },
   "dependencies": {
     "bluebird": "^3.5.0",
