@@ -84,24 +84,22 @@ module.exports = {
         filename: '[name].js'
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\/src\/.*\.js$/,
-                loaders: [
-                    'closure-loader'
-                ],
+                loader: 'closure-loader',
+                options: {
+                    paths: [
+                        __dirname + '/src',
+                    ],
+                    es6mode: true,
+                    watch: true,
+                    fileExt: '.js',
+                },
                 exclude: [/node_modules/, /test/]
             }
         ]
     },
-    closureLoader: {
-        paths: [
-            __dirname + '/src'
-        ],
-        es6mode: true,
-        watch: true,
-        fileExt: '.js'
-    }
 };
 ```
 
