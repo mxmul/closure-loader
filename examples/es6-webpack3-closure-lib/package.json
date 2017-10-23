@@ -18,6 +18,6 @@
     "webpack-dev-server": "^2.4.0"
   },
   "dependencies": {
-    "google-closure-library": "^20150920.0.0"
+    "google-closure-library": "^20170910.0.0"
   }
 }
