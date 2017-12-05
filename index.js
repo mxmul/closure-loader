@@ -231,9 +231,9 @@ module.exports = function (source, inputSourceMap) {
                 rootVar,
                 '=__merge(',
                 rootVar,
-                '||window.',
+                '||__merge({}, window.',
                 rootVar,
-                '||{},',
+                '),',
                 JSON.stringify(globalVarTree[rootVar]),
                 ');'
             ].join('');
