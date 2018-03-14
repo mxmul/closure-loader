@@ -57,7 +57,7 @@ module.exports = function (source, inputSourceMap) {
             .filter(removeNested)
             .map(buildVarTree(exportVarTree));
 
-        prefix = createPrefix(globalVarTree, options.eval);
+        prefix = createPrefix(globalVarTree, config.eval);
         postfix = createPostfix(exportVarTree, exportedVars, config);
 
         if(inputSourceMap) {
