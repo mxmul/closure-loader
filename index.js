@@ -7,6 +7,7 @@ var loaderUtils = require("loader-utils"),
         paths: [],
         es6mode: false,
         watch: true,
+        eval: true,
         fileExt: '.js'
     },
     prefix, postfix;
@@ -56,7 +57,7 @@ module.exports = function (source, inputSourceMap) {
             .filter(removeNested)
             .map(buildVarTree(exportVarTree));
 
-        prefix = createPrefix(globalVarTree, globalVars);
+        prefix = createPrefix(globalVarTree, globalVars, options.eval);
         postfix = createPostfix(exportVarTree, exportedVars, config);
 
         if(inputSourceMap) {
@@ -207,7 +208,8 @@ module.exports = function (source, inputSourceMap) {
      *
      * This will create all provided or required namespaces. It will merge those namespaces into an existing
      * object if existent. The declarations will be executed via eval because other plugins or loaders like
-     * the ProvidePlugin will see that a variable is created and might not work as expected.
+     * the ProvidePlugin will see that a variable is created and might not work as expected. Eval can
+     * be skipped by setting options.eval to false.
      *
      * Example: If you require or provide a namespace under 'goog' and have the closure library export
      * its global goog object and use that via ProvidePlugin, the plugin wouldn't inject the goog variable
@@ -215,6 +217,7 @@ module.exports = function (source, inputSourceMap) {
      *
      * @param globalVarTree
      * @param globalVars
+     * @param useEval
      * @returns {string}
      */
     function createPrefix(globalVarTree, globalVars) {
@@ -231,7 +234,11 @@ module.exports = function (source, inputSourceMap) {
         });
         evalContent = evalContent.replace(/'/g, "\\'");
 
-        prefix += `eval('${evalContent}');`;
+        if (useEval) {
+            prefix += `eval('${evalContent}');`;
+        } else {
+            prefix += evalContent;
+        }
 
         prefix += `${JSON.stringify(globalVars)}.forEach(function(n){ __exportPath(__closureLoaderNamespace, n); });`;
 
