@@ -220,7 +220,7 @@ module.exports = function (source, inputSourceMap) {
      * @param useEval
      * @returns {string}
      */
-    function createPrefix(globalVarTree, globalVars) {
+    function createPrefix(globalVarTree, globalVars, useEval) {
         let prefix = '';
         prefix += `var __exportPath=require(${loaderUtils.stringifyRequest(self, require.resolve('./export-path.js'))});`;
         prefix += 'var __closureLoaderNamespace = {};';
