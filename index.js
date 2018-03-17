@@ -57,7 +57,7 @@ module.exports = function (source, inputSourceMap) {
             .filter(removeNested)
             .map(buildVarTree(exportVarTree));
 
-        prefix = createPrefix(globalVarTree, config.eval);
+        prefix = createPrefix(globalVarTree, globalVars, config.eval);
         postfix = createPostfix(exportVarTree, exportedVars, config);
 
         if(inputSourceMap) {
@@ -117,13 +117,7 @@ module.exports = function (source, inputSourceMap) {
         path = loaderUtils.stringifyRequest(self, provideMap[key]);
         requireString = 'require(' + path + ').' + key;
 
-        // if the required module is a parent of a provided module, use deep-extend so that injected
-        // namespaces are not overwritten
-        if (isParent(key, exportedVars)) {
-          return source.replace(replaceRegex, key + '=__merge(' + requireString + ', (' + key + ' || {}));');
-        } else {
-          return source.replace(replaceRegex, key + '=' + requireString + ';');
-        }
+        return source.replace(replaceRegex, `__exportPath(__closureLoaderNamespace,'${key}',${requireString});`);
     }
 
     /**
@@ -214,7 +208,7 @@ module.exports = function (source, inputSourceMap) {
      *
      * This will create all provided or required namespaces. It will merge those namespaces into an existing
      * object if existent. The declarations will be executed via eval because other plugins or loaders like
-     * the ProvidePlugin will see that a variable is created and might not work as expected. Eval can 
+     * the ProvidePlugin will see that a variable is created and might not work as expected. Eval can
      * be skipped by setting options.eval to false.
      *
      * Example: If you require or provide a namespace under 'goog' and have the closure library export
@@ -222,30 +216,33 @@ module.exports = function (source, inputSourceMap) {
      * into a module that creates its own goog variables. That's why it has to be executed in eval.
      *
      * @param globalVarTree
+     * @param globalVars
      * @param useEval
      * @returns {string}
      */
-    function createPrefix(globalVarTree, useEval) {
-        var merge = "var __merge=require(" + loaderUtils.stringifyRequest(self, require.resolve('deep-extend')) + ");";
-        prefix = '';
-        Object.keys(globalVarTree).forEach(function (rootVar) {
-            prefix += [
-                'var ',
-                rootVar,
-                '=__merge(',
-                rootVar,
-                '||__merge({}, window.',
-                rootVar,
-                '),',
-                JSON.stringify(globalVarTree[rootVar]),
-                ');'
-            ].join('');
+    function createPrefix(globalVarTree, globalVars, useEval) {
+        let prefix = '';
+        prefix += `var __exportPath=require(${loaderUtils.stringifyRequest(self, require.resolve('./export-path.js'))});`;
+        prefix += 'var __closureLoaderNamespace = {};';
+        Object.keys(globalVarTree).forEach((rootVar) => {
+            prefix += `__closureLoaderNamespace.${rootVar} = (typeof ${rootVar} !== "undefined") ? ${rootVar} : window.${rootVar} || {};`;
         });
+
+        let evalContent = '';
+        Object.keys(globalVarTree).forEach((rootVar) => {
+            evalContent += `var ${rootVar} = __closureLoaderNamespace.${rootVar};`;
+        });
+        evalContent = evalContent.replace(/'/g, "\\'");
+
         if (useEval) {
-            return merge + "eval('" +  prefix.replace(/'/g, "\\'") + "');";
+            prefix += `eval('${evalContent}');`;
         } else {
-            return merge + prefix.replace(/'/g, "\\'") + ";";
+            prefix += evalContent;
         }
+
+        prefix += `${JSON.stringify(globalVars)}.forEach(function(n){ __exportPath(__closureLoaderNamespace, n); });`;
+
+        return prefix;
     }
 
     /**
