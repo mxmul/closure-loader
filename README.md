@@ -1,6 +1,8 @@
+# No longer maintained
+This package is no longer maintained. See [#38](https://github.com/eXaminator/closure-loader/issues/38)
+
 # Closure library dependency loader for [Webpack](http://webpack.github.io/)
 
-[![Join the chat at https://gitter.im/eXaminator/closure-loader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/eXaminator/closure-loader?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Dependency Status](https://david-dm.org/examinator/closure-loader.svg)](https://david-dm.org/examinator/closure-loader)
 [![npm version](https://badge.fury.io/js/closure-loader.svg)](https://badge.fury.io/js/closure-loader)
 
