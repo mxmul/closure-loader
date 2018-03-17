@@ -64,7 +64,7 @@ function resolveAndCacheDirectory(directory, watch, fileExt) {
 
     cache[directory] = (watch ? createWatchPromise(directory) : Promise.resolve())
         .then(function() {
-            return glob(path.join(directory, '/**/*' + fileExt));
+            return glob(path.join(directory, '**', '*' + fileExt));
         })
         .map(function(filePath) {
             return findProvideCalls(filePath);
