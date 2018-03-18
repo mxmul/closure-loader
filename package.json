@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/eXaminator/closure-loader.git"
+    "url": "git://github.com/mxmul/closure-loader.git"
   },
   "author": "Steven Weingärtner",
   "contributors": [

@@ -1,9 +1,6 @@
-# No longer maintained
-This package is no longer maintained. See [#38](https://github.com/eXaminator/closure-loader/issues/38)
-
 # Closure library dependency loader for [Webpack](http://webpack.github.io/)
 
-[![Dependency Status](https://david-dm.org/examinator/closure-loader.svg)](https://david-dm.org/examinator/closure-loader)
+[![Dependency Status](https://david-dm.org/mxmul/closure-loader.svg)](https://david-dm.org/mxmul/closure-loader)
 [![npm version](https://badge.fury.io/js/closure-loader.svg)](https://badge.fury.io/js/closure-loader)
 
 This is a webpack loader which resolves `goog.provide()` and `goog.require()` statements in webpack
@@ -145,6 +142,13 @@ The following examples are available:
   preferably es6 as this is now the standard.
 
 **NOTE**: This loader does in no way include or wrap the actual google closure library. If you want to use the closure library you will have to include it yourself and ensure correct shimming. See the above examples on how this can be done.
+
+## Authors
+
+* **Steven Weingärtner** - *Original author & maintainer* - [eXaminator](https://github.com/eXaminator)
+* **Matt Mulder** - *Current maintainer* - [mxmul](https://github.com/mxmul)
+
+See also the list of [contributors](https://github.com/mxmul/closure-loader/graphs/contributors) who participated in this project.
 
 ## License
 
