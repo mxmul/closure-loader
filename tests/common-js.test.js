@@ -12,14 +12,18 @@ const config = {
                         loader: require.resolve('..'),
                         options: {
                             paths: [
-                                path.join(__dirname, 'fixtures', 'common-js', 'legacy-code'),
+                                path.join(
+                                    __dirname,
+                                    'fixtures',
+                                    'common-js',
+                                    'legacy-code',
+                                ),
                             ],
                             es6mode: false,
                             watch: false,
-                        }
+                        },
                     },
-                ]
-
+                ],
             },
         ],
     },
@@ -33,6 +37,7 @@ test('loads goog modules with require()', async () => {
     const bundle = fs.readFileSync('/dist/main.bundle.js', 'utf-8');
     const spy = jest.spyOn(console, 'log');
 
+    // eslint-disable-next-line no-eval
     eval(bundle);
 
     expect(spy).toMatchSnapshot();

@@ -24,14 +24,17 @@ const config = {
                         loader: require.resolve('..'),
                         options: {
                             paths: [
-                                path.join(__dirname, '..', 'node_modules/google-closure-library/closure/goog'),
+                                path.join(
+                                    __dirname,
+                                    '..',
+                                    'node_modules/google-closure-library/closure/goog',
+                                ),
                             ],
                             es6mode: false,
                             watch: false,
-                        }
+                        },
                     },
-                ]
-
+                ],
             },
         ],
     },
@@ -39,7 +42,7 @@ const config = {
         new webpack.ProvidePlugin({
             goog: 'google-closure-library/closure/goog/base',
         }),
-    ]
+    ],
 };
 
 test('loads closure library modules with goog.require()', async () => {
@@ -50,6 +53,7 @@ test('loads closure library modules with goog.require()', async () => {
     const bundle = fs.readFileSync('/dist/main.bundle.js', 'utf-8');
     const spy = jest.spyOn(console, 'log');
 
+    // eslint-disable-next-line no-eval
     eval(bundle);
 
     expect(spy).toMatchSnapshot();

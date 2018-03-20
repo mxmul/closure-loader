@@ -4,7 +4,8 @@
   "description": "Webpack loader for google closure library dependencies",
   "main": "lib/index.js",
   "scripts": {
-    "test": "jest"
+    "test": "yarn lint && jest",
+    "lint": "eslint lib **/*.test.js"
   },
   "keywords": [
     "webpack",
@@ -33,6 +34,9 @@
     "source-map": "^0.5.1"
   },
   "devDependencies": {
+    "@sharkcore/eslint-config": "^1.0.2",
+    "eslint": "^4.19.0",
+    "eslint-plugin-jest": "^21.15.0",
     "exports-loader": "^0.7.0",
     "google-closure-library": "^20180204.0.0",
     "imports-loader": "^0.8.0",
