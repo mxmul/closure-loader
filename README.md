@@ -1,7 +1,8 @@
 # Closure library dependency loader for [Webpack](http://webpack.github.io/)
 
-[![Dependency Status](https://david-dm.org/mxmul/closure-loader.svg)](https://david-dm.org/mxmul/closure-loader)
-[![npm version](https://badge.fury.io/js/closure-loader.svg)](https://badge.fury.io/js/closure-loader)
+[![npm][npm]][npm-url]
+[![deps][deps]][deps-url]
+[![test][test]][test-url]
 
 This is a webpack loader which resolves `goog.provide()` and `goog.require()` statements in webpack
 just like if they were regular CommonJS modules.
@@ -117,31 +118,26 @@ Here are the configuration options specific for this loader:
 - **fileExt** (string, default: '.js'): Files extension which will be searched for dependency resolving. 
   Support [glob](https://github.com/isaacs/node-glob) pattern syntax.
 
-## Examples
-In the hopes of clarifying the usage of the loader a bit I have provided a couple of examples which
-you can find in the `examples` directory.
+**NOTE**: This loader does in no way include or wrap the actual google closure library. If you want to use the closure library you will have to include it yourself and ensure correct shimming:
 
-To run an example please follow these steps:
-- `npm install` in the closure-loader root directory
-- `npm install` in the directory of the example
-- `npm start` or `npm run build` in the directory of the example
-
-The following examples are available:
-- **common-js**: This example shows how to load some legacy code that contains `goog.provide()` and
-  `goog.require()` via commonJs `require()` calls.
-- **common-js-closure-lib**: This example shows how to load the closure library via commonJs
-  `require()` calls.
-- **es6**: This example shows how to load some legacy code that contains `goog.provide()` and
-  `goog.require()` via babel and es6 `import` calls.
-- **es6-closure-lib**: This example shows how to load the closure library via babel and es6
-  `import` calls.
-- **es6-fileext**: Demonstrates how different filetypes can be used using the fileExt option.
-- **es6-webpack2**: Demonstrates how this loader can be used with webpack2
-- **legacy-closure-lib**: This example shows how to load the closure library via your own `goog.require()`
-  calls. This is not advised. If you are using webpack you should think about using a proper module loader,
-  preferably es6 as this is now the standard.
-
-**NOTE**: This loader does in no way include or wrap the actual google closure library. If you want to use the closure library you will have to include it yourself and ensure correct shimming. See the above examples on how this can be done.
+```javascript
+module: {
+    rules: [
+        {
+            test: /google-closure-library\/closure\/goog\/base/,
+            use: [
+                'imports-loader?this=>{goog:{}}&goog=>this.goog',
+                'exports-loader?goog',
+            ],
+        },
+    ],
+},
+plugins: [
+    new webpack.ProvidePlugin({
+        goog: 'google-closure-library/closure/goog/base',
+    }),
+]
+```
 
 ## Authors
 
@@ -153,3 +149,12 @@ See also the list of [contributors](https://github.com/mxmul/closure-loader/grap
 ## License
 
 MIT (http://www.opensource.org/licenses/mit-license.php)
+
+[npm]: https://img.shields.io/npm/v/closure-loader.svg
+[npm-url]: https://npmjs.com/package/closure-loader
+
+[deps]: https://david-dm.org/mxmul/closure-loader.svg
+[deps-url]: https://david-dm.org/mxmul/closure-loader
+
+[test]: http://img.shields.io/travis/mxmul/closure-loader.svg
+[test-url]: https://travis-ci.org/mxmul/closure-loader
