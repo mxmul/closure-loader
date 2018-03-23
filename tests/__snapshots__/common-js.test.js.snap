@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`loads goog modules with require() 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "this is some.legacy.namespace.myFn",
+    ],
+    Array [
+      "some.legacy.namespace.otherModule.text =",
+      "This is from otherModule.",
+    ],
+    Array [
+      "Some var:",
+      42,
+    ],
+  ],
+}
+`;

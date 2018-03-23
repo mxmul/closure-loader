@@ -2,9 +2,9 @@
   "name": "closure-loader",
   "version": "0.7.0",
   "description": "Webpack loader for google closure library dependencies",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "webpack",
@@ -21,9 +21,7 @@
     "Matthias Harmuth <mcpain83@gmail.com>"
   ],
   "license": "MIT",
-  "peerDependencies": {
-    "webpack": "^1.9.10 || ^2.0.0 || ^3.0.0"
-  },
+  "peerDependencies": {},
   "dependencies": {
     "bluebird": "^3.5.0",
     "chokidar": "^1.7.0",
@@ -33,5 +31,14 @@
     "loader-utils": "^1.1.0",
     "lodash": "^4.17.4",
     "source-map": "^0.5.1"
+  },
+  "devDependencies": {
+    "exports-loader": "^0.7.0",
+    "google-closure-library": "^20180204.0.0",
+    "imports-loader": "^0.8.0",
+    "jest": "^22.4.3",
+    "memory-fs": "^0.4.1",
+    "webpack": "^3.11.0",
+    "webpack-merge": "^4.1.2"
   }
 }

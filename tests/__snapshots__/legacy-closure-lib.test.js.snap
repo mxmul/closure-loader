@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`loads closure library modules with goog.require() 1`] = `
+[MockFunction] {
+  "calls": Array [
+    Array [
+      "Inner box in outer box",
+      true,
+    ],
+    Array [
+      "Outer box in inner box",
+      false,
+    ],
+    Array [
+      "calculating if one box contains another",
+    ],
+    Array [
+      "Outer box in inner box",
+      false,
+    ],
+  ],
+}
+`;
