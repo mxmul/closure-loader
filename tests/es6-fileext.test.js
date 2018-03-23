@@ -12,15 +12,19 @@ const config = {
                         loader: require.resolve('..'),
                         options: {
                             paths: [
-                                path.join(__dirname, 'fixtures', 'es6-fileext', 'legacy-code'),
+                                path.join(
+                                    __dirname,
+                                    'fixtures',
+                                    'es6-fileext',
+                                    'legacy-code',
+                                ),
                             ],
                             es6mode: true,
                             fileExt: '.{js,es6}',
                             watch: false,
-                        }
+                        },
                     },
-                ]
-
+                ],
             },
         ],
     },
@@ -34,6 +38,7 @@ test('detects modules in files matching fileExt', async () => {
     const bundle = fs.readFileSync('/dist/main.bundle.js', 'utf-8');
     const spy = jest.spyOn(console, 'log');
 
+    // eslint-disable-next-line no-eval
     eval(bundle);
 
     expect(spy).toMatchSnapshot();
