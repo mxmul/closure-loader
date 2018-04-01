@@ -1,38 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`detects modules in files matching fileExt 1`] = `
-[MockFunction] {
-  "calls": Array [
-    Array [
-      "This should contain the empty submodule:",
-      Object {
-        "value": "This is a module",
-      },
-    ],
-    Array [
-      "Call via default export:",
-    ],
-    Array [
-      "this is some.legacy.namespace.myFn",
-    ],
-    Array [
-      "some.legacy.namespace.otherModule.text =",
-      "This is from otherModule.",
-    ],
-    Array [
-      "Call via named export:",
-    ],
-    Array [
-      "this is some.legacy.namespace.myFn",
-    ],
-    Array [
-      "some.legacy.namespace.otherModule.text =",
-      "This is from otherModule.",
-    ],
-    Array [
-      "Some var:",
-      42,
-    ],
-  ],
-}
+"This should contain the empty submodule: { value: 'This is a module' }
+Call via default export:
+this is some.legacy.namespace.myFn
+some.legacy.namespace.otherModule.text = This is from otherModule.
+Call via named export:
+this is some.legacy.namespace.myFn
+some.legacy.namespace.otherModule.text = This is from otherModule.
+Some var: 42"
 `;
