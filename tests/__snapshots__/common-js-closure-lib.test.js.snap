@@ -1,16 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`loads closure library modules with require() 1`] = `
-[MockFunction] {
-  "calls": Array [
-    Array [
-      "Inner box in outer box",
-      true,
-    ],
-    Array [
-      "Outer box in inner box",
-      false,
-    ],
-  ],
-}
+"Inner box in outer box true
+Outer box in inner box false"
 `;

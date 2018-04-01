@@ -1,6 +1,5 @@
-const MemoryFS = require('memory-fs');
 const path = require('path');
-const compile = require('./helpers/compile');
+const execBundle = require('./helpers/execBundle');
 
 const config = {
     module: {
@@ -30,18 +29,7 @@ const config = {
 };
 
 test('loads goog modules with es6 import', async () => {
-    const fs = new MemoryFS();
-    const stats = (await compile('es6', config, fs)).toJson();
-    expect(stats.errors).toHaveLength(0);
-
-    const bundle = fs.readFileSync('/dist/main.bundle.js', 'utf-8');
-    const spy = jest.spyOn(console, 'log');
-
-    // eslint-disable-next-line no-eval
-    eval(bundle);
-
-    expect(spy).toMatchSnapshot();
-
-    spy.mockReset();
-    spy.mockRestore();
+    const result = await execBundle('es6', config);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toMatchSnapshot();
 });
