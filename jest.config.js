@@ -3,10 +3,10 @@ module.exports = {
     collectCoverageFrom: ['lib/**/*.js'],
     coverageThreshold: {
         global: {
-            statements: 83.69,
-            branches: 73.81,
-            lines: 84.17,
-            functions: 82.35,
+            statements: 87.67,
+            branches: 79.55,
+            lines: 87.59,
+            functions: 84.85,
         },
     },
 };
