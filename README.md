@@ -156,5 +156,5 @@ MIT (http://www.opensource.org/licenses/mit-license.php)
 [deps]: https://david-dm.org/mxmul/closure-loader.svg
 [deps-url]: https://david-dm.org/mxmul/closure-loader
 
-[test]: http://img.shields.io/travis/mxmul/closure-loader.svg
+[test]: http://img.shields.io/travis/mxmul/closure-loader/master.svg
 [test-url]: https://travis-ci.org/mxmul/closure-loader
