@@ -12,17 +12,18 @@
     "loader",
     "closure"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/mxmul/closure-loader.git"
-  },
+  "repository": "mxmul/closure-loader",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "lib/"
+  ],
   "author": "Steven Weingärtner",
   "contributors": [
     "Michael van Engelshoven <michael@van-engelshoven.de>",
     "Matthias Harmuth <mcpain83@gmail.com>"
   ],
   "license": "MIT",
-  "peerDependencies": {},
   "dependencies": {
     "bluebird": "^3.5.0",
     "chokidar": "^1.7.0",
