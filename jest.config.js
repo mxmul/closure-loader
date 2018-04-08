@@ -1,6 +1,7 @@
 module.exports = {
     collectCoverage: true,
     collectCoverageFrom: ['lib/**/*.js'],
+    testEnvironment: 'node',
     coverageThreshold: {
         global: {
             statements: 87.67,
