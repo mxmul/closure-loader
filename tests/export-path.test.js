@@ -17,7 +17,8 @@ describe('export-path', () => {
         const namespace = {};
         exportPath(namespace, 'a.b');
         expect(namespace.a.b).toBeDefined();
-        exportPath(namespace, 'a', 'foo');
+        exportPath(namespace, 'a', () => 12);
         expect(namespace.a.b).toBeDefined();
+        expect(namespace.a()).toBe(12);
     });
 });
