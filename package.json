@@ -26,25 +26,25 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "chokidar": "^1.7.0",
-    "deep-extend": "^0.5.0",
+    "chokidar": "^2.0.3",
+    "deep-extend": "^0.6.0",
     "glob": "^7.1.1",
     "graceful-fs": "^4.1.11",
     "loader-utils": "^1.1.0",
-    "lodash": "^4.17.4",
-    "source-map": "^0.5.1"
+    "lodash": "^4.17.10",
+    "source-map": "^0.7.3"
   },
   "devDependencies": {
     "@sharkcore/eslint-config": "^1.0.2",
     "eslint": "^4.19.0",
-    "eslint-plugin-jest": "^21.15.0",
+    "eslint-plugin-jest": "^21.17.0",
     "execa": "^0.10.0",
     "exports-loader": "^0.7.0",
-    "google-closure-library": "^20180204.0.0",
+    "google-closure-library": "^20180506.0.0",
     "imports-loader": "^0.8.0",
-    "jest": "^22.4.3",
+    "jest": "^23.0.1",
     "memory-fs": "^0.4.1",
-    "webpack": "^4.5.0",
+    "webpack": "^4.10.1",
     "webpack-merge": "^4.1.2"
   }
 }
