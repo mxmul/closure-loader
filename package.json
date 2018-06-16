@@ -1,6 +1,6 @@
 {
   "name": "closure-loader",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Webpack loader for google closure library dependencies",
   "main": "lib/index.js",
   "scripts": {
