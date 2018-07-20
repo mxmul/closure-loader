@@ -1,4 +1,4 @@
-# Google Closure module loader for [Webpack](http://webpack.github.io/)
+# [Webpack](http://webpack.github.io/) loader for [Google Closure](https://developers.google.com/closure/) modules ✨
 
 [![npm][npm]][npm-url]
 [![deps][deps]][deps-url]
