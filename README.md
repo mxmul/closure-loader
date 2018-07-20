@@ -1,10 +1,10 @@
-# Closure library dependency loader for [Webpack](http://webpack.github.io/)
+# Google Closure module loader for [Webpack](http://webpack.github.io/)
 
 [![npm][npm]][npm-url]
 [![deps][deps]][deps-url]
 [![test][test]][test-url]
 
-This is a webpack loader which resolves `goog.provide()` and `goog.require()` statements in webpack
+This is a Webpack loader which resolves `goog.provide()` and `goog.require()` statements in Webpack
 just like if they were regular CommonJS modules.
 
 ## Installation
@@ -13,7 +13,7 @@ just like if they were regular CommonJS modules.
 ## Usage
 [Documentation: Using loaders](http://webpack.github.io/docs/using-loaders.html)
 
-**NOTE**: This loader is mainly meant for building (probably older) closure library projects with webpack
+**NOTE**: This loader is mainly meant for building (probably older) Closure Compiler projects with Webpack
 and to make a transition to other module systems (CommonJS or ES6) easier.
 
 There are two parts to this loader:
@@ -26,13 +26,13 @@ There are two parts to this loader:
     - It assigns the value of the namespace from the provide file and assign it to the same
       namespace in the current module
 
-In the simplest way you can just use those two statements like you usually would with the google closure library.
+In the simplest way you can just use those two statements like you usually would with Google Closure Tools.
 
-**NOTE**: Usually the closure lib simply creates all namespaces on the **global** scope (i.e. the window object).
+**NOTE**: Usually the Closure compiler simply creates all namespaces on the **global** scope (i.e. the window object).
 This is **not** the case if you use this loader. Every file ("module") has its own scope just like it would have
 if you used CommonJS syntax.
 
-You can use closure library dependencies in conjunction with CommonJS syntax. You can load any module that uses
+You can use Closure dependencies in conjunction with CommonJS syntax. You can load any module that uses
 `goog.provide()` with `require()`, but not the other way round.
 
 ```javascript
@@ -72,7 +72,7 @@ module(); // will output 'my module was loaded' to the console
 ```
 
 ## Configuration
-Here is an example webpack config for this loader:
+Here is an example Webpack config for this loader:
 
 ```javascript
 module.exports = {
@@ -118,7 +118,7 @@ Here are the configuration options specific for this loader:
 - **fileExt** (string, default: '.js'): Files extension which will be searched for dependency resolving. 
   Support [glob](https://github.com/isaacs/node-glob) pattern syntax.
 
-**NOTE**: This loader does in no way include or wrap the actual google closure library. If you want to use the closure library you will have to include it yourself and ensure correct shimming:
+**NOTE**: This loader in no way includes or wraps the actual Google Closure Library. If you want to use the Closure Library you will have to include it yourself and ensure correct shimming:
 
 ```javascript
 module: {
