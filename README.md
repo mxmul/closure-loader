@@ -1,11 +1,11 @@
-# [Webpack](http://webpack.github.io/) loader for [Google Closure](https://developers.google.com/closure/) modules ✨
+# closure-loader
 
 [![npm][npm]][npm-url]
 [![deps][deps]][deps-url]
 [![test][test]][test-url]
 
 This is a Webpack loader which resolves `goog.provide()` and `goog.require()` statements in Webpack
-just like if they were regular CommonJS modules.
+as if they were regular CommonJS modules.
 
 ## Installation
 ```npm install --save-dev closure-loader```
