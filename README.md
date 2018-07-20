@@ -11,7 +11,7 @@ as if they were regular CommonJS modules.
 ```npm install --save-dev closure-loader```
 
 ## Usage
-[Documentation: Using loaders](http://webpack.github.io/docs/using-loaders.html)
+[Documentation: Using loaders](https://webpack.js.org/concepts/loaders/#using-loaders)
 
 **NOTE**: This loader is mainly meant for building (probably older) Closure Compiler projects with Webpack
 and to make a transition to other module systems (CommonJS or ES6) easier.
