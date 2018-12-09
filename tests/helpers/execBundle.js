@@ -7,5 +7,6 @@ module.exports = async function execBundle(fixture, config) {
     const stats = (await compile(fixture, config, fs)).toJson();
     expect(stats.errors).toHaveLength(0);
     const bundle = fs.readFileSync('/dist/main.bundle.js', 'utf-8');
+    console.log(`${fixture} BUNDLE SIZE: ${bundle.length} bytes`);
     return execa('node', { input: bundle });
 };

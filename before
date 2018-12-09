@@ -1,0 +1,35 @@
+ PASS  tests/es6-fileext.test.js (6.392s)
+  ● Console
+
+    console.log tests/helpers/execBundle.js:10
+      es6-fileext BUNDLE SIZE: 3324 bytes
+
+ PASS  tests/common-js.test.js (6.569s)
+  ● Console
+
+    console.log tests/helpers/execBundle.js:10
+      common-js BUNDLE SIZE: 2725 bytes
+
+ PASS  tests/es6.test.js (6.967s)
+  ● Console
+
+    console.log tests/helpers/execBundle.js:10
+      es6 BUNDLE SIZE: 3324 bytes
+
+ PASS  tests/common-js-closure-lib.test.js (13.639s)
+  ● Console
+
+    console.log tests/helpers/execBundle.js:10
+      common-js-closure-lib BUNDLE SIZE: 59757 bytes
+
+ PASS  tests/es6-closure-lib.test.js (13.672s)
+  ● Console
+
+    console.log tests/helpers/execBundle.js:10
+      es6-closure-lib BUNDLE SIZE: 60146 bytes
+
+ PASS  tests/legacy-closure-lib.test.js (13.692s)
+  ● Console
+
+    console.log tests/helpers/execBundle.js:10
+      legacy-closure-lib BUNDLE SIZE: 60606 bytes
