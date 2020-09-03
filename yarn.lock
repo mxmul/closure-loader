@@ -2000,9 +2000,9 @@ globby@^5.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-google-closure-library@^20180506.0.0:
-  version "20180506.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-library/-/google-closure-library-20180506.0.0.tgz#2d2da92c27c10dc00313fff80a5158b554ca9908"
+google-closure-library@^20190301.0.0:
+  version "20190301.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-library/-/google-closure-library-20190301.0.0.tgz#1d0f584ad207dc3869af44668e7fbf04d10acdee"
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.2:
   version "4.1.11"
